@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Myco</string>
+    <string name="app_description">Red mesh de mensajería sin internet</string>
+    <string name="developed_by">desarrollado por Batalla Group</string>
+</resources>

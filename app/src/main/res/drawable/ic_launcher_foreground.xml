@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Nodo central -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M54,54m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+
+    <!-- Filamentos del micelio -->
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,46 L36,28" />
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,46 L72,28" />
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M46,54 L24,48" />
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M62,54 L84,48" />
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M50,62 L38,80" />
+    <path
+        android:strokeColor="#1B5E20"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M58,62 L70,80" />
+
+    <!-- Nodos externos -->
+    <path android:fillColor="#4CAF50" android:pathData="M36,28m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#4CAF50" android:pathData="M72,28m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#4CAF50" android:pathData="M24,48m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#4CAF50" android:pathData="M84,48m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#4CAF50" android:pathData="M38,80m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#4CAF50" android:pathData="M70,80m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+</vector>

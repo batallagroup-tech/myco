@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- No respaldar datos sensibles -->
+    <exclude domain="sharedpref" path="myco_secure_prefs.xml" />
+    <exclude domain="database" path="myco_db" />
+</full-backup-content>
