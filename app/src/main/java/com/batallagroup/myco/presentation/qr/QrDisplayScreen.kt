@@ -89,9 +89,20 @@ fun QrDisplayScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
-            Text("Tu ID en la red", color = MycoSubtle, fontSize = 12.sp)
+            val userAlias by viewModel.userAlias.collectAsState()
+            if (userAlias.isNotBlank()) {
+                Text(
+                    userAlias,
+                    color = MycoOnSurface,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(2.dp))
+            }
+
+            Text("ID en la red Mesh", color = MycoSubtle, fontSize = 12.sp)
             Spacer(Modifier.height(4.dp))
             Text(
                 viewModel.myUserId,

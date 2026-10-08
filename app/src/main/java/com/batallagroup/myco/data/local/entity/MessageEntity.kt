@@ -15,7 +15,10 @@ data class MessageEntity(
     val expiresAt: Long,
     val status: String,
     val hopCount: Int,
-    val isOutgoing: Boolean
+    val isOutgoing: Boolean,
+    val transportType: String = "RELAY",
+    val isSos: Boolean = false,
+    val isRead: Boolean = true
 ) {
     fun toDomain() = Message(
         id = id,
@@ -26,7 +29,10 @@ data class MessageEntity(
         expiresAt = expiresAt,
         status = MessageStatus.valueOf(status),
         hopCount = hopCount,
-        isOutgoing = isOutgoing
+        isOutgoing = isOutgoing,
+        transportType = transportType,
+        isSos = isSos,
+        isRead = isRead
     )
 
     companion object {
@@ -39,7 +45,10 @@ data class MessageEntity(
             expiresAt = m.expiresAt,
             status = m.status.name,
             hopCount = m.hopCount,
-            isOutgoing = m.isOutgoing
+            isOutgoing = m.isOutgoing,
+            transportType = m.transportType,
+            isSos = m.isSos,
+            isRead = m.isRead
         )
     }
 }

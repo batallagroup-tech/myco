@@ -18,6 +18,9 @@ interface TransitMessageDao {
     @Query("DELETE FROM transit_messages WHERE expiresAt < :now")
     suspend fun deleteExpired(now: Long = System.currentTimeMillis())
 
+    @Query("DELETE FROM transit_messages WHERE messageId = :messageId")
+    suspend fun deleteByMessageId(messageId: String)
+
     @Query("DELETE FROM transit_messages")
     suspend fun clearAll()
 

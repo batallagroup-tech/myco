@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Myco — Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --green:       #3DBA52;
+    --green-dim:   #1a4d24;
+    --green-glow:  rgba(61,186,82,.35);
+    --bg:          #080808;
+    --s1:          #101010;
+    --s2:          #161616;
+    --s3:          #1e1e1e;
+    --s4:          #282828;
+    --text:        #f0f0f0;
+    --text2:       #8a8a8a;
+    --text3:       #444;
+    --error:       #e05c6a;
+    --glass:       rgba(10,10,10,.88);
+    --gb:          rgba(255,255,255,.055);
+    --b-out:       #112218;
+    --b-in:        #131313;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+  body {
+    background:
+      radial-gradient(ellipse 65% 55% at 8% 65%, rgba(30,90,38,.1) 0%, transparent 100%),
+      radial-gradient(ellipse 45% 35% at 92% 12%, rgba(61,186,82,.06) 0%, transparent 100%),
+      #050505;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  /* ─── Desktop nav ─── */
+  .desktop-nav {
+    width: 100%; max-width: 960px;
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 28px;
+    padding: 8px 12px;
+    background: rgba(8,8,8,.92);
+    backdrop-filter: blur(24px);
+    border-radius: 16px;
+    border: 1px solid var(--gb);
+    box-shadow: 0 1px 40px rgba(0,0,0,.6);
+  }
+  .desktop-nav > span {
+    color: var(--text3); font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 8px; align-self: center; margin-right: 4px;
+  }
+  .nav-btn {
+    padding: 7px 14px; border-radius: 10px;
+    border: 1px solid transparent; background: transparent;
+    color: var(--text3); font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-btn:hover { color: var(--green); background: rgba(61,186,82,.07); border-color: rgba(61,186,82,.15); }
+  .nav-btn.active { background: var(--green); color: #000; font-weight: 700; box-shadow: 0 0 18px rgba(61,186,82,.35); border-color: transparent; }
+  .nav-btn:active { transform: scale(.94); }
+
+  /* ─── Layout ─── */
+  .phone-wrap { display: flex; gap: 32px; align-items: flex-start; justify-content: center; width: 100%; max-width: 960px; }
+
+  .phone-frame {
+    width: 375px; min-width: 375px;
+    background: var(--bg);
+    border-radius: 48px;
+    border: 1.5px solid rgba(255,255,255,.07);
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(61,186,82,.04), 0 50px 130px rgba(0,0,0,.98);
+    position: relative;
+  }
+  .phone-notch {
+    width: 112px; height: 28px; background: #000;
+    border-radius: 0 0 18px 18px; margin: 0 auto;
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .notch-speaker { width: 38px; height: 5px; border-radius: 3px; background: #181818; }
+  .notch-cam { width: 10px; height: 10px; border-radius: 50%; background: #151515; border: 1px solid #222; }
+  .phone-screen { min-height: 780px; overflow: hidden; position: relative; }
+
+  /* ─── Screens ─── */
+  .screen { display: none; flex-direction: column; height: 780px; }
+  .screen.active { display: flex; }
+  @keyframes scrIn  { from { opacity:0; transform:translateY(18px) scale(.985); } to { opacity:1; transform:none; } }
+  @keyframes scrOut { from { opacity:1; } to { opacity:0; transform:translateY(-8px); } }
+
+  /* ══════════════════════════════
+     SPLASH
+  ══════════════════════════════ */
+  .splash {
+    background: radial-gradient(ellipse 80% 70% at 50% 42%, rgba(26,77,36,.32) 0%, transparent 70%), var(--bg);
+    align-items: center; justify-content: center;
+  }
+  .splash-logo-wrap { margin-bottom: 28px; animation: logoPulse 3s ease-in-out infinite; }
+  @keyframes logoPulse {
+    0%,100% { filter: drop-shadow(0 0 18px rgba(61,186,82,.3)); }
+    50% { filter: drop-shadow(0 0 52px rgba(61,186,82,.7)); }
+  }
+  .splash-title {
+    font-size: 44px; font-weight: 900; letter-spacing: 14px;
+    background: linear-gradient(135deg, #3DBA52 0%, #7ed88f 50%, #3DBA52 100%);
+    background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: gradFlow 3s linear infinite;
+  }
+  @keyframes gradFlow { to { background-position: 200% center; } }
+  .splash-sub { font-size: 11px; color: #333; letter-spacing: 3.5px; margin-top: 10px; text-transform: uppercase; animation: fadeUp .9s ease .6s both; }
+  .splash-credit {
+    margin-top: 56px; display: flex; flex-direction: column; align-items: center; gap: 7px;
+    animation: fadeUp .9s ease 1.1s both;
+  }
+  .splash-credit::before {
+    content: ''; display: block; width: 32px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(61,186,82,.4), transparent);
+    margin-bottom: 2px;
+  }
+  .splash-credit-label { font-size: 10px; color: #383838; letter-spacing: 2.5px; text-transform: uppercase; }
+  .splash-credit-brand { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,.45); }
+  .splash-credit-brand span { color: var(--green); text-shadow: 0 0 14px rgba(61,186,82,.35); }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  /* ══════════════════════════════
+     ONBOARDING
+  ══════════════════════════════ */
+  .onboarding {
+    background: radial-gradient(ellipse 60% 40% at 50% 15%, rgba(26,77,36,.15) 0%, transparent 60%), var(--bg);
+    padding: 44px 24px 28px; align-items: center;
+  }
+  .ob-emoji { font-size: 72px; margin-bottom: 28px; filter: drop-shadow(0 4px 28px rgba(61,186,82,.22)); animation: emojiFloat 3.5s ease-in-out infinite; }
+  @keyframes emojiFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-9px); } }
+  .ob-title {
+    font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 8px;
+    background: linear-gradient(135deg, #3DBA52, #7ed88f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .ob-sub { font-size: 15px; color: var(--text); text-align: center; margin-bottom: 14px; font-weight: 500; }
+  .ob-desc { font-size: 14px; color: var(--text2); text-align: center; line-height: 1.75; }
+  .ob-dots { display: flex; gap: 8px; margin-top: auto; margin-bottom: 18px; }
+  .ob-dot { height: 5px; border-radius: 3px; transition: all .4s cubic-bezier(.34,1.56,.64,1); }
+  .ob-dot.active { width: 28px; background: var(--green); box-shadow: 0 0 12px rgba(61,186,82,.5); }
+  .ob-dot:not(.active) { width: 5px; background: var(--s4); }
+  .legal-card { background: var(--s2); border-radius: 18px; padding: 20px; margin-top: 8px; width: 100%; border: 1px solid rgba(61,186,82,.1); }
+  .legal-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 13px; color: var(--text); line-height: 1.65; }
+  .legal-item .dot { color: var(--green); flex-shrink: 0; margin-top: 3px; }
+  .legal-check { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--s3); font-size: 13px; color: var(--text); }
+  .legal-check input[type=checkbox] { accent-color: var(--green); width: 18px; height: 18px; cursor: pointer; }
+
+  /* ══════════════════════════════
+     IDENTITY
+  ══════════════════════════════ */
+  .identity {
+    background: radial-gradient(ellipse 60% 50% at 50% 28%, rgba(26,77,36,.22) 0%, transparent 60%), var(--bg);
+    padding: 52px 24px 28px; align-items: center;
+  }
+  .id-title {
+    font-size: 24px; font-weight: 800; margin-bottom: 8px;
+    background: linear-gradient(135deg, #3DBA52, #7ed88f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .id-sub { font-size: 13px; color: var(--text2); text-align: center; line-height: 1.65; margin-bottom: 36px; }
+  .id-card {
+    background: rgba(12,12,12,.95); border: 1px solid rgba(61,186,82,.25);
+    border-radius: 22px; padding: 28px; width: 100%;
+    text-align: center; position: relative; overflow: hidden;
+    box-shadow: 0 0 60px rgba(61,186,82,.06), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .id-card::after {
+    content: ''; position: absolute; left: -60%; top: 0; bottom: 0; width: 60%;
+    background: linear-gradient(90deg, transparent, rgba(61,186,82,.07), transparent);
+    animation: cardScan 3.5s ease-in-out infinite;
+  }
+  @keyframes cardScan { 0% { left:-60%; } 100% { left:160%; } }
+  .id-label { font-size: 10px; color: var(--text2); margin-bottom: 14px; letter-spacing: 2px; text-transform: uppercase; }
+  .id-value { font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 600; color: var(--green); letter-spacing: 8px; text-shadow: 0 0 28px rgba(61,186,82,.5); }
+  .id-keys { display: flex; justify-content: space-around; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--s3); }
+  .id-key-item { text-align: center; }
+  .id-key-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; }
+  .id-key-val { font-size: 12px; color: var(--text); font-weight: 600; margin-top: 5px; }
+  .id-success { color: #5ac96a; font-size: 13px; margin-top: 22px; animation: fadeUp .5s ease both; display: flex; align-items: center; gap: 6px; justify-content: center; }
+
+  /* ══════════════════════════════
+     TOPBAR
+  ══════════════════════════════ */
+  .topbar {
+    background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    padding: 11px 14px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--gb); flex-shrink: 0;
+  }
+  .topbar-back {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--gb);
+    color: var(--green); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all .18s;
+  }
+  .topbar-back:hover { background: rgba(61,186,82,.1); border-color: rgba(61,186,82,.22); }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--text); flex: 1; }
+  .topbar-actions { display: flex; gap: 4px; }
+  .topbar-icon-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--gb);
+    color: var(--text2); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all .18s;
+  }
+  .topbar-icon-btn:hover { background: rgba(61,186,82,.08); color: var(--green); border-color: rgba(61,186,82,.2); }
+
+  /* ══════════════════════════════
+     BOTTOM NAV — MODERN
+  ══════════════════════════════ */
+  .bottombar {
+    background: rgba(6,6,6,.96); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+    display: flex; border-top: 1px solid rgba(255,255,255,.045);
+    flex-shrink: 0; padding: 6px 8px 20px; gap: 2px;
+  }
+  .tab-btn {
+    flex: 1; padding: 5px 2px;
+    background: none; border: none;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    border-radius: 14px; transition: all .2s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+  }
+  .tab-btn:active { transform: scale(.88); }
+  .tab-icon-wrap {
+    width: 38px; height: 32px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text3); transition: all .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tab-btn.active .tab-icon-wrap {
+    background: rgba(61,186,82,.13);
+    color: var(--green);
+    box-shadow: 0 0 14px rgba(61,186,82,.14);
+    transform: scale(1.08);
+  }
+  .tab-label { font-size: 10px; font-weight: 600; color: var(--text3); transition: color .2s; letter-spacing: .2px; }
+  .tab-btn.active .tab-label { color: var(--green); }
+  .tab-btn.active::after {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--green);
+    border-radius: 0 0 3px 3px; box-shadow: 0 0 8px rgba(61,186,82,.7);
+  }
+
+  /* ══════════════════════════════
+     BUTTON PRIMARY
+  ══════════════════════════════ */
+  .btn-primary {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, #3DBA52, #5fcf6e);
+    color: #000; border: none; border-radius: 16px;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-top: auto; letter-spacing: .2px;
+    box-shadow: 0 6px 24px rgba(61,186,82,.32);
+    transition: all .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(61,186,82,.42); }
+  .btn-primary:active { transform: scale(.97); }
+
+  /* ══════════════════════════════
+     CHATS LIST
+  ══════════════════════════════ */
+  .chats-header { padding: 20px 20px 0; flex-shrink: 0; }
+  .chats-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .chats-title {
+    font-size: 28px; font-weight: 900;
+    background: linear-gradient(135deg, #3DBA52, #7ed88f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .node-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(26,77,36,.18); border: 1px solid rgba(61,186,82,.18);
+    padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(12px);
+  }
+  .node-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); position: relative;
+    box-shadow: 0 0 7px rgba(61,186,82,.9);
+  }
+  .node-dot::before, .node-dot::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid var(--green); opacity: 0; animation: nRing 2.2s ease-out infinite;
+  }
+  .node-dot::after { animation-delay: .55s; }
+  @keyframes nRing { 0% { transform:scale(.5); opacity:.65; } 100% { transform:scale(3); opacity:0; } }
+  .node-txt { font-size: 11px; color: var(--green); font-weight: 700; }
+
+  /* Search bar */
+  .search-bar {
+    display: flex; align-items: center; gap: 9px;
+    background: var(--s2); border: 1px solid var(--s3);
+    border-radius: 13px; padding: 10px 14px; margin-bottom: 10px;
+    color: var(--text2); transition: border-color .2s;
+  }
+  .search-bar:focus-within { border-color: rgba(61,186,82,.25); }
+  .search-input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  }
+  .search-input::placeholder { color: var(--text3); }
+
+  .chats-list { flex: 1; overflow-y: auto; }
+
+  /* Chat row */
+  .chat-row {
+    display: flex; align-items: center; gap: 13px;
+    padding: 11px 20px; cursor: pointer; transition: background .15s;
+  }
+  .chat-row:hover { background: rgba(255,255,255,.02); }
+
+  /* Avatar — gradient per contact */
+  .av {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .av-a { background: linear-gradient(135deg, #0d3320, #1a6035); color: #4ecb67; }
+  .av-b { background: linear-gradient(135deg, #0d2633, #1a4d6e); color: #4dc7e1; }
+  .av-c { background: linear-gradient(135deg, #1e2a0d, #3a5e1a); color: #8cd466; }
+  .av-d { background: linear-gradient(135deg, #1e1a0d, #4a3d10); color: #d4b84c; }
+
+  .chat-info { flex: 1; min-width: 0; }
+  .chat-row-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  .chat-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .chat-time { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+  .chat-row-bot { display: flex; align-items: center; justify-content: space-between; }
+  .chat-preview { font-size: 13px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .chat-unread {
+    min-width: 20px; height: 20px; border-radius: 10px;
+    background: var(--green); color: #000;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 6px; flex-shrink: 0; margin-left: 8px;
+  }
+
+  /* FAB */
+  .fab {
+    position: absolute; bottom: 82px; right: 18px;
+    width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, #3DBA52, #5fcf6e);
+    border: none; color: #000;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    animation: fabPulse 2.8s ease-in-out infinite;
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes fabPulse {
+    0%,100% { box-shadow:0 6px 24px rgba(61,186,82,.5), 0 0 0 0 rgba(61,186,82,.25); }
+    60%      { box-shadow:0 6px 24px rgba(61,186,82,.5), 0 0 0 16px rgba(61,186,82,0); }
+  }
+  .fab:hover { transform: scale(1.1) rotate(90deg); }
+  .fab:active { transform: scale(.92); }
+
+  /* ══════════════════════════════
+     CHAT CONVERSATION
+  ══════════════════════════════ */
+  .chat-screen {
+    background: radial-gradient(ellipse 55% 35% at 50% 88%, rgba(26,77,36,.09) 0%, transparent 60%), var(--bg);
+  }
+  .chat-topbar-status {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 6px rgba(61,186,82,.8); animation: dotGlow 2s ease-in-out infinite;
+  }
+  .chat-topbar-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .chat-topbar-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); margin-top: 1px; }
+
+  /* Date separator */
+  .date-sep {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; margin: 4px 0;
+  }
+  .date-sep-line { flex: 1; height: 1px; background: var(--s3); }
+  .date-sep-txt { font-size: 11px; color: var(--text3); font-weight: 500; white-space: nowrap; }
+
+  .messages-area { flex: 1; overflow-y: auto; padding: 8px 12px 4px; display: flex; flex-direction: column; gap: 2px; }
+
+  .msg { max-width: 82%; display: flex; flex-direction: column; }
+  .msg.out { align-self: flex-end; align-items: flex-end; }
+  .msg.in  { align-self: flex-start; align-items: flex-start; }
+  .msg.msg-new { animation: msgIn .28s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes msgIn { from { opacity:0; transform:translateY(12px) scale(.97); } to { opacity:1; transform:none; } }
+
+  .bubble {
+    padding: 9px 13px; font-size: 14px; line-height: 1.5;
+    color: var(--text); border-radius: 20px; position: relative;
+    max-width: 100%;
+  }
+  .msg.out .bubble { background: var(--b-out); border-top-right-radius: 5px; border: 1px solid rgba(61,186,82,.09); }
+  .msg.in  .bubble { background: var(--b-in); border-top-left-radius: 5px; border: 1px solid rgba(255,255,255,.04); }
+  .bubble-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 0 2px; margin-top: 3px; }
+  .bubble-time { font-size: 10px; color: var(--text3); }
+  .bubble-status { display: flex; align-items: center; }
+
+  /* Chat input */
+  .chat-input-area {
+    background: var(--glass); backdrop-filter: blur(24px);
+    padding: 10px 12px 20px;
+    display: flex; gap: 8px; align-items: center;
+    border-top: 1px solid var(--gb); flex-shrink: 0;
+  }
+  .chat-input {
+    flex: 1; background: var(--s2); border: 1px solid var(--s3);
+    border-radius: 22px; padding: 11px 16px;
+    color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+    outline: none; transition: border-color .2s;
+  }
+  .chat-input:focus { border-color: rgba(61,186,82,.28); }
+  .chat-input::placeholder { color: var(--text3); }
+  .send-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #3DBA52, #5fcf6e);
+    border: none; color: #000;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    box-shadow: 0 3px 14px rgba(61,186,82,.38);
+    transition: all .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .send-btn:hover { transform: scale(1.1); box-shadow: 0 6px 22px rgba(61,186,82,.55); }
+  .send-btn:active { transform: scale(.9); }
+
+  /* ══════════════════════════════
+     NETWORK
+  ══════════════════════════════ */
+  .network-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .stats-row { display: flex; gap: 10px; }
+  .stat-card {
+    flex: 1; background: rgba(10,10,10,.92); border-radius: 18px; padding: 18px 16px;
+    text-align: center; border: 1px solid var(--gb);
+    position: relative; overflow: hidden; transition: border-color .3s;
+  }
+  .stat-card:hover { border-color: rgba(61,186,82,.18); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(61,186,82,.45), transparent);
+  }
+  .stat-val {
+    font-size: 38px; font-weight: 900;
+    background: linear-gradient(135deg, #3DBA52, #7ed88f);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 4px; font-weight: 500; }
+  .section-label { font-size: 10px; color: var(--text3); letter-spacing: 2px; font-weight: 700; text-transform: uppercase; }
+  .graph-card { background: rgba(6,6,6,.98); border-radius: 22px; overflow: hidden; height: 240px; border: 1px solid var(--gb); }
+  .node-list { display: flex; flex-direction: column; gap: 6px; }
+  .node-row {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(10,10,10,.92); border: 1px solid var(--gb);
+    border-radius: 14px; padding: 12px 16px; transition: all .2s;
+  }
+  .node-row:hover { border-color: rgba(61,186,82,.14); transform: translateX(2px); }
+  .node-dot-green {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0;
+    animation: dotGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes dotGlow { 0%,100% { box-shadow:0 0 4px rgba(61,186,82,.5); } 50% { box-shadow:0 0 14px rgba(61,186,82,.95); } }
+  .node-id { flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); }
+  .node-rssi { font-size: 11px; color: var(--text2); }
+
+  /* ══════════════════════════════
+     SETTINGS
+  ══════════════════════════════ */
+  .settings-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .settings-section-label { font-size: 10px; color: var(--text3); letter-spacing: 2px; font-weight: 700; margin-bottom: 7px; text-transform: uppercase; }
+  .settings-card { background: rgba(10,10,10,.92); border-radius: 18px; overflow: hidden; border: 1px solid var(--gb); }
+  .settings-item { padding: 14px 18px; border-bottom: 1px solid rgba(30,30,30,.9); transition: background .15s; }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item:hover { background: rgba(255,255,255,.018); }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; }
+  .settings-label { font-size: 14px; color: var(--text); font-weight: 500; }
+  .settings-value { font-size: 13px; color: var(--text2); }
+  .settings-sublabel { font-size: 12px; color: var(--text3); margin-top: 4px; line-height: 1.45; }
+  .id-hero-card {
+    background: rgba(10,10,10,.92); border-radius: 18px; padding: 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid rgba(61,186,82,.14);
+  }
+  .id-hero-val {
+    font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600;
+    color: var(--green); letter-spacing: 4px; text-shadow: 0 0 20px rgba(61,186,82,.3);
+  }
+  .id-hero-actions { display: flex; gap: 5px; }
+  .toggle {
+    width: 46px; height: 26px; border-radius: 13px;
+    background: linear-gradient(135deg, #3DBA52, #5fcf6e);
+    position: relative; cursor: pointer; border: none; flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(61,186,82,.28); transition: background .3s;
+  }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; top: 3px; right: 3px;
+    transition: right .3s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 1px 5px rgba(0,0,0,.4);
+  }
+  .toggle.off { background: var(--s4); box-shadow: none; }
+  .toggle.off::after { right: calc(100% - 23px); }
+  .danger-btn { background: none; border: none; color: var(--error); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 0; transition: opacity .2s; }
+  .danger-btn:hover { opacity: .65; }
+  .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(24,24,24,.95); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 13px; color: var(--text2); }
+  .info-val { font-size: 13px; color: var(--text); font-weight: 600; }
+
+  /* ══════════════════════════════
+     QR
+  ══════════════════════════════ */
+  .qr-screen { background: var(--bg); }
+  .qr-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 28px; }
+  .qr-sub { font-size: 14px; color: var(--text2); text-align: center; line-height: 1.7; }
+  .qr-box {
+    width: 240px; height: 240px; background: #fff; border-radius: 24px;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    animation: qrPulse 3s ease-in-out infinite;
+  }
+  @keyframes qrPulse {
+    0%,100% { box-shadow: 0 0 0 1px rgba(61,186,82,.22), 0 0 30px rgba(61,186,82,.1), 0 20px 64px rgba(0,0,0,.8); }
+    50%      { box-shadow: 0 0 0 3px rgba(61,186,82,.4), 0 0 60px rgba(61,186,82,.2), 0 20px 64px rgba(0,0,0,.8); }
+  }
+  .qr-id-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; }
+  .qr-id-val { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600; color: var(--green); letter-spacing: 4px; margin-top: 6px; text-shadow: 0 0 22px rgba(61,186,82,.35); }
+
+  /* ══════════════════════════════
+     SIDEBAR
+  ══════════════════════════════ */
+  .sidebar { width: 280px; display: flex; flex-direction: column; gap: 12px; }
+  .sidebar-card {
+    background: rgba(8,8,8,.92); backdrop-filter: blur(24px);
+    border-radius: 20px; padding: 20px;
+    border: 1px solid var(--gb); box-shadow: 0 4px 36px rgba(0,0,0,.4);
+    transition: border-color .3s;
+  }
+  .sidebar-card:hover { border-color: rgba(61,186,82,.1); }
+  .sidebar-title { font-size: 10px; font-weight: 800; color: var(--green); letter-spacing: 2px; margin-bottom: 16px; text-transform: uppercase; }
+  .sidebar-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 11px; }
+  .sidebar-item:last-child { margin-bottom: 0; }
+  .sidebar-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); margin-top: 7px; flex-shrink: 0; box-shadow: 0 0 6px rgba(61,186,82,.5); }
+  .sidebar-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .sidebar-text strong { color: var(--text); font-weight: 600; }
+  .palette { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .palette-row { display: flex; align-items: center; gap: 10px; }
+  .palette-chip { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; }
+  .palette-info { font-size: 11px; color: var(--text2); }
+  .palette-info span { color: var(--text); font-weight: 600; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(61,186,82,.14); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(61,186,82,.3); }
+
+  /* ══ VOICE MESSAGES ══ */
+  .voice-bubble-body { display:flex; align-items:center; gap:10px; padding:2px 0; min-width:186px; }
+  .voice-play { width:30px; height:30px; border-radius:50%; background:var(--green); border:none; color:#000; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:transform .15s; }
+  .voice-play:active { transform:scale(.9); }
+  .voice-waveform { flex:1; display:flex; align-items:center; gap:2px; height:26px; }
+  .voice-bar { width:3px; border-radius:2px; background:rgba(255,255,255,.18); }
+  .voice-bar.played { background:var(--green); }
+  .voice-dur { font-size:11px; color:var(--text3); font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+
+  /* ══ REPLY QUOTE ══ */
+  .reply-quote { background:rgba(255,255,255,.05); border-left:2.5px solid var(--green); border-radius:8px; padding:6px 10px; margin-bottom:5px; }
+  .reply-quote-author { font-size:11px; color:var(--green); font-weight:600; margin-bottom:2px; }
+  .reply-quote-text { font-size:12px; color:var(--text2); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+
+  /* ══ REACTIONS ══ */
+  .reactions { display:flex; gap:4px; margin-top:5px; flex-wrap:wrap; }
+  .reaction-pill { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:3px 9px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all .15s; }
+  .reaction-pill.mine { background:rgba(61,186,82,.15); border-color:rgba(61,186,82,.3); }
+  .reaction-pill:hover { transform:scale(1.08); }
+  .reaction-count { font-size:11px; color:var(--text2); font-weight:600; }
+
+  /* ══ CONTEXT MENU ══ */
+  .ctx-overlay { position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); z-index:50; display:none; align-items:flex-end; justify-content:center; padding-bottom:80px; }
+  .ctx-overlay.visible { display:flex; }
+  .ctx-menu { background:var(--s2); border:1px solid var(--s3); border-radius:20px; padding:6px; width:230px; box-shadow:0 12px 60px rgba(0,0,0,.7); animation:scrIn .22s cubic-bezier(.22,1,.36,1) both; }
+  .ctx-reactions-row { display:flex; justify-content:space-around; padding:10px 6px 8px; border-bottom:1px solid var(--s3); margin-bottom:4px; }
+  .ctx-emoji { font-size:26px; cursor:pointer; transition:transform .15s; line-height:1; }
+  .ctx-emoji:hover { transform:scale(1.28); }
+  .ctx-item { width:100%; background:none; border:none; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; font-weight:500; padding:11px 14px; border-radius:12px; cursor:pointer; display:flex; align-items:center; gap:12px; transition:background .12s; text-align:left; }
+  .ctx-item:hover { background:rgba(255,255,255,.05); }
+  .ctx-item.danger { color:var(--error); }
+
+  /* ══ AUTO-DESTRUCT ══ */
+  .destruct-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(224,92,106,.1); border:1px solid rgba(224,92,106,.2); border-radius:8px; padding:2px 8px; margin-bottom:5px; font-size:11px; color:var(--error); }
+
+  /* ══ VOICE RECORDER UI ══ */
+  .voice-rec-ui { position:absolute; bottom:0; left:0; right:0; background:var(--glass); backdrop-filter:blur(24px); border-top:1px solid var(--gb); padding:14px 16px 24px; display:none; align-items:center; gap:10px; z-index:10; }
+  .voice-rec-ui.visible { display:flex; }
+  .rec-dot { width:9px; height:9px; border-radius:50%; background:var(--error); flex-shrink:0; animation:recBlink 1s ease-in-out infinite; }
+  @keyframes recBlink { 0%,100%{opacity:1;}50%{opacity:.2;} }
+  .rec-bars { flex:1; display:flex; align-items:center; gap:2px; height:28px; }
+  .rec-bar { width:3px; border-radius:2px; background:rgba(224,92,106,.35); }
+  .rec-time { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text2); }
+  .rec-cancel { background:rgba(255,255,255,.06); border:1px solid var(--s3); border-radius:10px; color:var(--text2); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:7px 12px; cursor:pointer; }
+  .rec-send-v { background:var(--green); border:none; border-radius:10px; color:#000; font-family:'Inter',sans-serif; font-size:13px; font-weight:700; padding:7px 12px; cursor:pointer; }
+
+  /* ══ SECTION DIVIDERS ══ */
+  .section-divider { display:flex; align-items:center; gap:10px; padding:10px 20px 4px; }
+  .section-divider-lbl { font-size:10px; color:var(--text3); letter-spacing:1.5px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
+  .section-divider-line { flex:1; height:1px; background:var(--s3); }
+
+  /* ══ INPUT ACTIONS ══ */
+  .input-action-btn { width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.04); border:1px solid var(--gb); color:var(--text3); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all .18s; }
+  .input-action-btn:hover { background:rgba(61,186,82,.08); color:var(--green); border-color:rgba(61,186,82,.2); }
+
+  /* ══ GROUP ══ */
+  .av-group { background:linear-gradient(135deg, #1a1a3e, #2d2d6e); color:#7d8fe8; }
+  .sender-name { font-size:11px; color:var(--green); font-weight:600; margin-bottom:3px; margin-left:2px; }
+  .group-admin-badge { display:inline-flex; align-items:center; background:rgba(61,186,82,.1); border:1px solid rgba(61,186,82,.2); border-radius:5px; padding:1px 6px; font-size:9px; color:var(--green); font-weight:700; margin-left:6px; letter-spacing:.5px; }
+  .mention { color:var(--green); font-weight:600; }
+  .group-member-count { font-size:11px; color:var(--text3); }
+
+  /* ══ TIMELINE (Red 24h) ══ */
+  .history-list { flex:1; overflow-y:auto; padding:10px 16px; display:flex; flex-direction:column; }
+  .tl-item { display:flex; gap:14px; position:relative; padding-bottom:16px; }
+  .tl-item:not(:last-child)::before { content:''; position:absolute; left:7px; top:16px; bottom:0; width:1px; background:var(--s3); }
+  .tl-dot { width:15px; height:15px; border-radius:50%; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; }
+  .tl-dot.app { background:rgba(61,186,82,.15); border:1.5px solid var(--green); }
+  .tl-dot.app::after { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); }
+  .tl-dot.dis { background:rgba(224,92,106,.1); border:1.5px solid rgba(224,92,106,.4); }
+  .tl-dot.dis::after { content:''; width:5px; height:5px; border-radius:50%; background:rgba(224,92,106,.7); }
+  .tl-body { flex:1; }
+  .tl-nodeid { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text); font-weight:600; }
+  .tl-action { font-size:11px; margin-top:2px; }
+  .tl-action.app { color:var(--green); }
+  .tl-action.dis { color:var(--error); }
+  .tl-time { font-size:11px; color:var(--text3); margin-top:2px; }
+  .tl-rssi { font-size:11px; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+
+  /* ══ HEATMAP ══ */
+  .heatmap-canvas-wrap { background:rgba(6,6,6,.98); border-radius:18px; overflow:hidden; border:1px solid var(--gb); }
+  .heatmap-legend { display:flex; align-items:center; gap:8px; }
+  .heatmap-legend-bar { flex:1; height:6px; border-radius:3px; background:linear-gradient(90deg, rgba(61,186,82,.08), var(--green)); }
+  .heatmap-legend-lbl { font-size:10px; color:var(--text3); }
+  .delivery-prob-bar { width:100%; height:8px; background:var(--s3); border-radius:4px; overflow:hidden; margin-top:6px; }
+  .delivery-prob-fill { height:100%; border-radius:4px; background:linear-gradient(90deg, #3DBA52, #7ed88f); }
+  .prob-big { font-size:42px; font-weight:900; background:linear-gradient(135deg,#3DBA52,#7ed88f); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+
+  /* ══ PING ══ */
+  .ping-chain { display:flex; flex-direction:column; align-items:center; gap:0; width:100%; }
+  .ping-node-wrap { display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .ping-node-circle { width:52px; height:52px; border-radius:50%; background:var(--s2); border:1.5px solid var(--s3); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text2); text-align:center; line-height:1.4; }
+  .ping-node-circle.me { border-color:var(--green); background:rgba(61,186,82,.07); color:var(--green); font-weight:600; }
+  .ping-node-circle.target { border-color:rgba(61,186,82,.35); background:rgba(61,186,82,.05); }
+  .ping-node-lbl { font-size:10px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+  .ping-connector { display:flex; flex-direction:column; align-items:center; gap:3px; padding:3px 0; }
+  .ping-line { width:1.5px; height:16px; background:linear-gradient(to bottom, rgba(61,186,82,.3), rgba(61,186,82,.15)); }
+  .ping-hop-badge { background:rgba(61,186,82,.1); border:1px solid rgba(61,186,82,.2); border-radius:10px; padding:2px 8px; font-size:10px; color:var(--green); font-weight:600; }
+  .ping-result-card { background:rgba(10,10,10,.92); border:1px solid rgba(61,186,82,.16); border-radius:18px; padding:20px; width:100%; text-align:center; }
+  .ping-metric-val { font-family:'JetBrains Mono',monospace; font-size:40px; font-weight:700; color:var(--green); line-height:1; }
+  .ping-metric-unit { font-size:12px; color:var(--text2); margin-top:4px; }
+
+  /* ══ PRIVACY POLICY ══ */
+  .policy-content { flex:1; overflow-y:auto; padding:16px 20px 28px; }
+  .policy-section { margin-bottom:20px; }
+  .policy-section-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .policy-section-title::before { content:''; width:3px; height:13px; background:var(--green); border-radius:2px; flex-shrink:0; }
+  .policy-text { font-size:12.5px; color:var(--text2); line-height:1.8; }
+  .policy-badge { display:inline-flex; align-items:center; gap:7px; background:rgba(61,186,82,.08); border:1px solid rgba(61,186,82,.15); border-radius:12px; padding:8px 16px; font-size:12px; color:var(--green); font-weight:600; margin-bottom:18px; }
+
+  /* ══ ABOUT ══ */
+  .about-content { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .about-hero { display:flex; flex-direction:column; align-items:center; gap:10px; padding:10px 0 6px; }
+  .about-version-badge { background:rgba(61,186,82,.1); border:1px solid rgba(61,186,82,.2); border-radius:20px; padding:4px 16px; font-size:11px; color:var(--green); font-weight:700; letter-spacing:1px; }
+  .about-item { display:flex; align-items:center; gap:12px; padding:13px 16px; border-bottom:1px solid rgba(30,30,30,.9); }
+  .about-item:last-child { border-bottom:none; }
+  .about-item-icon { width:32px; height:32px; border-radius:10px; background:rgba(61,186,82,.08); border:1px solid rgba(61,186,82,.14); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0; }
+  .about-item-lbl { font-size:12px; color:var(--text2); }
+  .about-item-val { font-size:13px; color:var(--text); font-weight:600; margin-top:1px; }
+  .batalla-credit { text-align:center; padding:18px 0 4px; }
+  .batalla-top { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+  .batalla-name { font-size:15px; font-weight:700; color:rgba(255,255,255,.45); margin-top:5px; letter-spacing:1px; }
+  .batalla-name span { color:var(--green); text-shadow:0 0 14px rgba(61,186,82,.35); }
+
+  /* ══ BLOCKED ══ */
+  .blocked-row { display:flex; align-items:center; gap:13px; padding:12px 20px; border-bottom:1px solid rgba(30,30,30,.6); }
+  .unblock-btn { background:none; border:1px solid rgba(224,92,106,.3); border-radius:9px; color:var(--error); font-family:'Inter',sans-serif; font-size:12px; font-weight:600; padding:5px 12px; cursor:pointer; transition:all .2s; margin-left:auto; }
+  .unblock-btn:hover { background:rgba(224,92,106,.08); }
+  .blocked-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+  .blocked-empty-icon { width:58px; height:58px; border-radius:50%; background:var(--s2); display:flex; align-items:center; justify-content:center; color:var(--text3); }
+
+  /* ══ PRIVACY DATA ══ */
+  .data-cols { display:flex; gap:10px; padding:14px; }
+  .data-col { flex:1; }
+  .data-col-hdr { font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; padding-bottom:10px; border-bottom:1px solid var(--s3); margin-bottom:10px; }
+  .data-col-hdr.yes { color:var(--green); }
+  .data-col-hdr.no { color:var(--error); }
+  .data-item { display:flex; align-items:flex-start; gap:7px; margin-bottom:9px; font-size:12px; color:var(--text2); line-height:1.5; }
+  .data-item-dot { width:5px; height:5px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .data-item-dot.yes { background:var(--green); }
+  .data-item-dot.no { background:var(--error); }
+
+  /* ══ GLOBAL SEARCH ══ */
+  .search-filters { display:flex; gap:6px; padding:0 16px 10px; flex-shrink:0; overflow-x:auto; }
+  .search-filter { background:var(--s2); border:1px solid var(--s3); border-radius:20px; padding:5px 14px; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--text2); cursor:pointer; white-space:nowrap; transition:all .18s; }
+  .search-filter.active { background:rgba(61,186,82,.12); border-color:rgba(61,186,82,.3); color:var(--green); }
+  .search-result-group { padding:0 16px 12px; }
+  .search-group-lbl { font-size:10px; color:var(--text3); letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:8px; }
+  .search-result-row { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(30,30,30,.6); cursor:pointer; }
+  .search-result-row:last-child { border-bottom:none; }
+  .search-result-row:hover { opacity:.75; }
+  .search-result-text { font-size:13px; color:var(--text); }
+  .search-result-sub { font-size:11px; color:var(--text2); margin-top:1px; }
+  .search-highlight { color:var(--green); font-weight:600; }
+  .search-results-area { flex:1; overflow-y:auto; }
+
+  /* ══ PERMISSION ONBOARDING ══ */
+  .perm-screen-inner { background:radial-gradient(ellipse 60% 40% at 50% 20%, rgba(26,77,36,.18) 0%, transparent 60%), var(--bg); padding:40px 24px 28px; align-items:center; }
+  .perm-step-dots { display:flex; gap:6px; margin-bottom:28px; }
+  .perm-step-dot { width:6px; height:6px; border-radius:3px; background:var(--s4); transition:all .35s cubic-bezier(.34,1.56,.64,1); }
+  .perm-step-dot.active { width:22px; background:var(--green); }
+  .perm-icon-wrap { width:90px; height:90px; border-radius:28px; background:rgba(61,186,82,.07); border:1.5px solid rgba(61,186,82,.2); display:flex; align-items:center; justify-content:center; margin-bottom:28px; color:var(--green); }
+  .perm-title { font-size:22px; font-weight:800; text-align:center; margin-bottom:10px; background:linear-gradient(135deg,#3DBA52,#7ed88f); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .perm-desc { font-size:13px; color:var(--text2); text-align:center; line-height:1.75; }
+  .perm-why { background:var(--s2); border:1px solid var(--s3); border-radius:14px; padding:14px 16px; margin-top:22px; width:100%; }
+  .perm-why-lbl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px; font-weight:700; }
+  .perm-why-text { font-size:12px; color:var(--text2); line-height:1.65; }
+  .perm-allow-btn { width:100%; padding:14px; background:linear-gradient(135deg,#3DBA52,#5fcf6e); border:none; border-radius:16px; font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:#000; cursor:pointer; margin-top:20px; box-shadow:0 6px 24px rgba(61,186,82,.32); transition:all .2s cubic-bezier(.34,1.56,.64,1); }
+  .perm-allow-btn:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(61,186,82,.42); }
+  .perm-skip { font-size:12px; color:var(--text3); text-align:center; margin-top:10px; cursor:pointer; }
+  .perm-skip:hover { color:var(--text2); }
+
+  /* ══ LOCK SCREEN ══ */
+  .lock-screen-inner { align-items:center; justify-content:center; gap:24px; background:radial-gradient(ellipse 60% 50% at 50% 30%, rgba(26,77,36,.18) 0%, transparent 60%), var(--bg); }
+  .lock-bio-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .lock-bio-btn { width:62px; height:62px; border-radius:50%; background:rgba(61,186,82,.07); border:1.5px solid rgba(61,186,82,.2); display:flex; align-items:center; justify-content:center; color:var(--green); cursor:pointer; transition:all .25s cubic-bezier(.34,1.56,.64,1); }
+  .lock-bio-btn:hover { background:rgba(61,186,82,.14); transform:scale(1.06); }
+  .lock-bio-lbl { font-size:12px; color:var(--text3); }
+  .pin-dots { display:flex; gap:18px; }
+  .pin-dot { width:13px; height:13px; border-radius:50%; border:2px solid rgba(255,255,255,.14); transition:all .2s cubic-bezier(.34,1.56,.64,1); }
+  .pin-dot.filled { background:var(--green); border-color:var(--green); box-shadow:0 0 10px rgba(61,186,82,.45); transform:scale(1.1); }
+  .numpad { display:grid; grid-template-columns:repeat(3, 72px); gap:12px; }
+  .numpad-key { width:72px; height:72px; border-radius:50%; background:var(--s2); border:1px solid var(--s3); color:var(--text); font-family:'Inter',sans-serif; font-size:24px; font-weight:300; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; transition:all .15s cubic-bezier(.34,1.56,.64,1); }
+  .numpad-key:hover { background:var(--s3); border-color:var(--s4); }
+  .numpad-key:active { transform:scale(.88); }
+  .numpad-key-sub { font-size:8px; color:var(--text3); letter-spacing:1.5px; font-weight:600; }
+  .numpad-key.special { background:none; border:none; color:var(--text2); font-size:15px; font-weight:500; }
+
+  /* ══ TOAST ══ */
+  .toast { position:absolute; bottom:90px; left:50%; transform:translateX(-50%); background:var(--s3); border:1px solid var(--s4); color:var(--text); font-size:13px; font-weight:500; padding:10px 20px; border-radius:20px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .22s; z-index:200; box-shadow:0 6px 28px rgba(0,0,0,.5); }
+  .toast.visible { opacity:1; }
+
+  /* ══ QR EXTRAS ══ */
+  .qr-link-row { display:flex; align-items:center; gap:8px; width:100%; }
+  .qr-link-box { flex:1; background:var(--s2); border:1px solid var(--s3); border-radius:12px; padding:11px 14px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:text; }
+  .qr-copy-btn { display:flex; align-items:center; gap:6px; background:rgba(61,186,82,.12); border:1px solid rgba(61,186,82,.22); border-radius:12px; color:var(--green); font-family:'Inter',sans-serif; font-size:13px; font-weight:700; padding:10px 16px; cursor:pointer; white-space:nowrap; transition:all .2s cubic-bezier(.34,1.56,.64,1); flex-shrink:0; }
+  .qr-copy-btn:hover { background:rgba(61,186,82,.2); transform:scale(1.04); }
+  .qr-copy-btn:active { transform:scale(.96); }
+  .qr-actions-row { display:flex; gap:8px; width:100%; }
+  .qr-action-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:7px; background:var(--s2); border:1px solid var(--s3); border-radius:14px; color:var(--text2); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:12px 8px; cursor:pointer; transition:all .2s; }
+  .qr-action-btn:hover { background:var(--s3); color:var(--text); border-color:var(--s4); }
+  .qr-action-btn:active { transform:scale(.96); }
+
+  /* ══ ALIAS MODAL ══ */
+  .alias-overlay { position:absolute; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:60; display:none; align-items:flex-end; justify-content:center; }
+  .alias-overlay.visible { display:flex; }
+  .alias-modal { background:var(--s2); border:1px solid var(--s3); border-radius:24px 24px 0 0; padding:24px 20px 36px; width:100%; animation:scrIn .25s cubic-bezier(.22,1,.36,1) both; }
+  .alias-modal-handle { width:36px; height:4px; border-radius:2px; background:var(--s4); margin:0 auto 20px; }
+  .alias-modal-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .alias-modal-sub { font-size:12px; color:var(--text2); margin-bottom:20px; line-height:1.6; }
+  .alias-input-wrap { background:var(--s3); border:1.5px solid var(--s4); border-radius:14px; padding:13px 16px; display:flex; align-items:center; gap:10px; margin-bottom:16px; transition:border-color .2s; }
+  .alias-input-wrap:focus-within { border-color:rgba(61,186,82,.35); }
+  .alias-input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'Inter',sans-serif; font-size:15px; }
+  .alias-input::placeholder { color:var(--text3); }
+  .alias-id-hint { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:18px; }
+  .alias-actions { display:flex; gap:10px; }
+  .alias-cancel { flex:1; padding:13px; background:var(--s3); border:1px solid var(--s4); border-radius:14px; color:var(--text2); font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer; transition:background .15s; }
+  .alias-cancel:hover { background:var(--s4); }
+  .alias-save { flex:1; padding:13px; background:linear-gradient(135deg,#3DBA52,#5fcf6e); border:none; border-radius:14px; color:#000; font-family:'Inter',sans-serif; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 18px rgba(61,186,82,.3); transition:all .2s cubic-bezier(.34,1.56,.64,1); }
+  .alias-save:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(61,186,82,.42); }
+  .alias-edit-hint { display:inline-flex; align-items:center; gap:4px; color:var(--text3); font-size:10px; margin-left:5px; cursor:pointer; }
+  .alias-edit-hint:hover { color:var(--green); }
+
+  /* ══ CREATE GROUP ══ */
+  .group-input-wrap { background:var(--s2); border:1px solid var(--s3); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:20px; transition:border-color .2s; }
+  .group-input-wrap:focus-within { border-color:rgba(61,186,82,.3); }
+  .group-input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'Inter',sans-serif; font-size:15px; font-weight:500; }
+  .group-input::placeholder { color:var(--text3); }
+  .contact-check-row { display:flex; align-items:center; gap:13px; padding:10px 20px; cursor:pointer; transition:background .15s; }
+  .contact-check-row:hover { background:rgba(255,255,255,.02); }
+  .contact-checkbox { width:22px; height:22px; border-radius:50%; border:2px solid var(--s4); background:none; display:flex; align-items:center; justify-content:center; transition:all .2s cubic-bezier(.34,1.56,.64,1); flex-shrink:0; }
+  .contact-checkbox.checked { background:var(--green); border-color:var(--green); }
+  .create-group-footer { padding:12px 20px 24px; background:var(--glass); backdrop-filter:blur(24px); border-top:1px solid var(--gb); }
+  .create-group-btn { width:100%; padding:14px; background:linear-gradient(135deg,#3DBA52,#5fcf6e); border:none; border-radius:16px; font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:#000; cursor:pointer; box-shadow:0 6px 24px rgba(61,186,82,.32); transition:all .2s cubic-bezier(.34,1.56,.64,1); }
+  .create-group-btn:hover { transform:translateY(-2px); }
+</style>
+</head>
+<body>
+
+<!-- Desktop nav -->
+<nav class="desktop-nav">
+  <span>Vista</span>
+  <button class="nav-btn active"  onclick="show('splash')">Splash</button>
+  <button class="nav-btn" onclick="show('onboarding')">Onboarding</button>
+  <button class="nav-btn" onclick="show('permissions')">Permisos</button>
+  <button class="nav-btn" onclick="show('identity')">Identidad</button>
+  <button class="nav-btn" onclick="show('chats')">Chats</button>
+  <button class="nav-btn" onclick="show('chat')">Chat</button>
+  <button class="nav-btn" onclick="show('create-group')">Nuevo Grupo</button>
+  <button class="nav-btn" onclick="show('group-chat')">Grupo Chat</button>
+  <button class="nav-btn" onclick="show('contacts')">Contactos</button>
+  <button class="nav-btn" onclick="show('search')">Buscar</button>
+  <button class="nav-btn" onclick="show('network')">Red</button>
+  <button class="nav-btn" onclick="show('network-history')">Red 24h</button>
+  <button class="nav-btn" onclick="show('heatmap')">Mapa Calor</button>
+  <button class="nav-btn" onclick="show('ping')">Ping</button>
+  <button class="nav-btn" onclick="show('settings')">Ajustes</button>
+  <button class="nav-btn" onclick="show('lock')">Bloqueo</button>
+  <button class="nav-btn" onclick="show('blocked')">Bloqueados</button>
+  <button class="nav-btn" onclick="show('privacy-data')">Mis Datos</button>
+  <button class="nav-btn" onclick="show('about')">Sobre Myco</button>
+  <button class="nav-btn" onclick="show('privacy-policy')">Política</button>
+  <button class="nav-btn" onclick="show('qr')">QR</button>
+</nav>
+
+<div class="phone-wrap">
+  <div class="phone-frame">
+    <div class="phone-notch">
+      <div class="notch-speaker"></div>
+      <div class="notch-cam"></div>
+    </div>
+    <div class="phone-screen">
+
+      <!-- ═══ SPLASH ═══ -->
+      <div class="screen splash active" id="screen-splash">
+        <div class="splash-logo-wrap">
+          <canvas id="logo-canvas" width="140" height="140"></canvas>
+        </div>
+        <div class="splash-title">MYCO</div>
+        <div class="splash-sub">red mesh sin internet</div>
+        <div class="splash-credit">
+          <span class="splash-credit-label">desarrollado por</span>
+          <span class="splash-credit-brand"><span>Batalla</span> Group</span>
+        </div>
+      </div>
+
+      <!-- ═══ ONBOARDING ═══ -->
+      <div class="screen onboarding" id="screen-onboarding">
+        <div class="ob-emoji" id="ob-emoji">🍄</div>
+        <div class="ob-title" id="ob-title">Bienvenido a Myco</div>
+        <div class="ob-sub"   id="ob-sub">La red que vive entre los teléfonos</div>
+        <div class="ob-desc"  id="ob-desc">Myco es una red de mensajería descentralizada. Tus mensajes viajan de teléfono en teléfono como el micelio de los hongos, sin necesitar internet ni cobertura móvil.</div>
+        <div id="legal-section" style="display:none;width:100%">
+          <div class="legal-card">
+            <div class="legal-item"><span class="dot">•</span>Myco retransmitirá mensajes cifrados de otros usuarios por hasta 24 horas</div>
+            <div class="legal-item"><span class="dot">•</span>Los mensajes no entregados se eliminan automáticamente</div>
+            <div class="legal-item"><span class="dot">•</span>Myco funciona actualmente solo en Android</div>
+            <div class="legal-item"><span class="dot">•</span>Diseñado para uso en emergencias y zonas sin cobertura</div>
+            <div class="legal-check">
+              <input type="checkbox" id="accept-cb" onchange="checkLegal()">
+              <label for="accept-cb">He leído y acepto las condiciones</label>
+            </div>
+          </div>
+        </div>
+        <div class="ob-dots" style="margin-top:auto;margin-bottom:16px">
+          <div class="ob-dot active" id="dot0"></div>
+          <div class="ob-dot" id="dot1"></div>
+          <div class="ob-dot" id="dot2"></div>
+          <div class="ob-dot" id="dot3"></div>
+        </div>
+        <button class="btn-primary" id="ob-btn" onclick="nextOb()" style="margin-top:0">Continuar</button>
+      </div>
+
+      <!-- ═══ IDENTITY ═══ -->
+      <div class="screen identity" id="screen-identity">
+        <div class="id-title">Generando identidad</div>
+        <div class="id-sub">Tus claves criptográficas son únicas y nunca salen de este dispositivo</div>
+        <div class="id-card">
+          <div class="id-label">Tu ID en la red</div>
+          <div class="id-value">a3f9b2c1</div>
+          <div class="id-keys">
+            <div class="id-key-item"><div class="id-key-label">Cifrado</div><div class="id-key-val">ECDH P-256</div></div>
+            <div class="id-key-item"><div class="id-key-label">Firma</div><div class="id-key-val">ECDSA SHA-256</div></div>
+          </div>
+        </div>
+        <div class="id-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Claves generadas y almacenadas de forma segura
+        </div>
+        <button class="btn-primary" onclick="show('chats')">Entrar a Myco</button>
+      </div>
+
+      <!-- ═══ CHATS ═══ -->
+      <div class="screen" id="screen-chats" style="background:var(--bg)">
+        <div class="chats-header">
+          <div class="chats-header-row">
+            <div class="chats-title">Myco</div>
+            <div class="node-badge">
+              <div class="node-dot"></div>
+              <span class="node-txt">3 nodos cerca</span>
+            </div>
+          </div>
+          <!-- Search bar -->
+          <div class="search-bar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" placeholder="Buscar conversación…">
+          </div>
+        </div>
+        <div class="chats-list">
+          <!-- PINNED -->
+          <div class="section-divider">
+            <span class="section-divider-lbl">Fijadas</span>
+            <div class="section-divider-line"></div>
+          </div>
+          <div class="chat-row" onclick="show('group-chat')" style="background:rgba(61,186,82,.025)">
+            <div class="av av-group" style="width:50px;height:50px;font-size:11px">GRP</div>
+            <div class="chat-info">
+              <div class="chat-row-top">
+                <span class="chat-name">Zona Norte 🌿
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;vertical-align:middle"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                </span>
+                <span class="chat-time">ahora</span>
+              </div>
+              <div class="chat-row-bot">
+                <span class="chat-preview">f7a2: nos vemos en el punto sur</span>
+                <span class="chat-unread">5</span>
+              </div>
+            </div>
+          </div>
+          <!-- RECENT -->
+          <div class="section-divider" style="padding-top:14px">
+            <span class="section-divider-lbl">Recientes</span>
+            <div class="section-divider-line"></div>
+          </div>
+          <!-- row with unread badge -->
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-a">f7a2</div>
+            <div class="chat-info">
+              <div class="chat-row-top">
+                <span class="chat-name">f7a23d91</span>
+                <span class="chat-time">14m</span>
+              </div>
+              <div class="chat-row-bot">
+                <span class="chat-preview">¿Sigues en la zona? No tengo señal</span>
+                <span class="chat-unread">2</span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-b">2b</div>
+            <div class="chat-info">
+              <div class="chat-row-top">
+                <span class="chat-name">2b8e1c47</span>
+                <span class="chat-time">1h</span>
+              </div>
+              <div class="chat-row-bot">
+                <span class="chat-preview">Recibido. Nos vemos en el punto.</span>
+                <!-- double-check gray = delivered -->
+                <span style="display:flex;align-items:center;flex-shrink:0;margin-left:8px">
+                  <svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-c">d9</div>
+            <div class="chat-info">
+              <div class="chat-row-top">
+                <span class="chat-name">d9c04a12</span>
+                <span class="chat-time">3h</span>
+              </div>
+              <div class="chat-row-bot">
+                <span class="chat-preview">Ok, el mensaje está en tránsito</span>
+                <!-- single check gray = sent -->
+                <span style="display:flex;align-items:center;flex-shrink:0;margin-left:8px">
+                  <svg width="13" height="11" viewBox="0 0 14 12" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6l4 4 8-8"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-d">88</div>
+            <div class="chat-info">
+              <div class="chat-row-top">
+                <span class="chat-name">88f1e920</span>
+                <span class="chat-time">ayer</span>
+              </div>
+              <div class="chat-row-bot">
+                <span class="chat-preview">No llegó a tiempo :(</span>
+                <!-- warning = failed -->
+                <span style="display:flex;align-items:center;flex-shrink:0;margin-left:8px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e05c6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="#e05c6a" stroke-width="0"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- FAB -->
+        <button class="fab" onclick="show('chat')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="bottombar">
+          <button class="tab-btn active" onclick="show('chats')">
+            <div class="tab-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <span class="tab-label">Chats</span>
+          </button>
+          <button class="tab-btn" onclick="show('contacts')">
+            <div class="tab-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <span class="tab-label">Contactos</span>
+          </button>
+          <button class="tab-btn" onclick="show('network')">
+            <div class="tab-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg>
+            </div>
+            <span class="tab-label">Red</span>
+          </button>
+          <button class="tab-btn" onclick="show('settings')">
+            <div class="tab-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <span class="tab-label">Ajustes</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ CONTACTS ═══ -->
+      <div class="screen" id="screen-contacts" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Contactos</div>
+          <div class="topbar-actions">
+            <button class="topbar-icon-btn" onclick="show('qr')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 0v3m0-3h3"/></svg>
+            </button>
+            <button class="topbar-icon-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto">
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-a">f7a2</div>
+            <div class="chat-info">
+              <div class="chat-row-top"><span class="chat-name">f7a23d91</span></div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px">ID: f7a23d91</div>
+            </div>
+          </div>
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-b">2b</div>
+            <div class="chat-info">
+              <div class="chat-row-top"><span class="chat-name">2b8e1c47</span></div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px">ID: 2b8e1c47</div>
+            </div>
+          </div>
+          <div class="chat-row" onclick="show('chat')">
+            <div class="av av-c">d9</div>
+            <div class="chat-info">
+              <div class="chat-row-top"><span class="chat-name">d9c04a12</span></div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px">ID: d9c04a12</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn active" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn" onclick="show('network')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+      <!-- ═══ CHAT CONVERSATION ═══ -->
+      <div class="screen chat-screen" id="screen-chat">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="av av-a" style="width:36px;height:36px;font-size:11px;flex-shrink:0">f7a2</div>
+          <div style="flex:1;cursor:pointer" onclick="openAlias()">
+            <div class="chat-topbar-name" style="display:flex;align-items:center;gap:4px">
+              <span id="chat-topbar-name-text">f7a23d91</span>
+              <span class="alias-edit-hint">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </span>
+            </div>
+            <div class="chat-topbar-sub">visto hace 14 min · 3 saltos</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="topbar-icon-btn" onclick="toggleCtx()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alias name modal -->
+        <div class="alias-overlay" id="alias-overlay" onclick="closeAlias()">
+          <div class="alias-modal" onclick="event.stopPropagation()">
+            <div class="alias-modal-handle"></div>
+            <div class="alias-modal-title">Nombre personalizado</div>
+            <div class="alias-modal-sub">Solo visible para ti — el ID criptográfico real no cambia en la red.</div>
+            <div class="alias-input-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input class="alias-input" id="alias-input" placeholder="Ej: María, Punto Norte, Coordinador…" maxlength="30">
+            </div>
+            <div class="alias-id-hint">ID real en la red: <span style="color:var(--green)">f7a23d91</span></div>
+            <div class="alias-actions">
+              <button class="alias-cancel" onclick="closeAlias()">Cancelar</button>
+              <button class="alias-save" onclick="saveAlias()">Guardar nombre</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context menu overlay -->
+        <div class="ctx-overlay" id="ctx-overlay" onclick="toggleCtx()">
+          <div class="ctx-menu" onclick="event.stopPropagation()">
+            <div class="ctx-reactions-row">
+              <span class="ctx-emoji" onclick="toggleCtx()">👍</span>
+              <span class="ctx-emoji" onclick="toggleCtx()">❤️</span>
+              <span class="ctx-emoji" onclick="toggleCtx()">😂</span>
+              <span class="ctx-emoji" onclick="toggleCtx()">😮</span>
+              <span class="ctx-emoji" onclick="toggleCtx()">😢</span>
+            </div>
+            <button class="ctx-item" onclick="toggleCtx()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>
+              Responder
+            </button>
+            <button class="ctx-item" onclick="toggleCtx()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar texto
+            </button>
+            <button class="ctx-item" onclick="toggleCtx()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Auto-destruir…
+            </button>
+            <button class="ctx-item danger" onclick="toggleCtx()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+              Eliminar para todos
+            </button>
+          </div>
+        </div>
+
+        <div class="messages-area" id="messages-area">
+          <div class="date-sep"><div class="date-sep-line"></div><span class="date-sep-txt">Hoy</span><div class="date-sep-line"></div></div>
+
+          <!-- Standard incoming -->
+          <div class="msg in">
+            <div class="bubble">¿Sigues en la zona norte? Aquí no hay señal desde ayer</div>
+            <div class="bubble-meta"><span class="bubble-time">14:02</span></div>
+          </div>
+
+          <!-- Voice message (incoming) -->
+          <div class="msg in">
+            <div class="bubble">
+              <div class="voice-bubble-body">
+                <button class="voice-play">
+                  <svg width="11" height="13" viewBox="0 0 12 14" fill="currentColor"><path d="M1 1l10 6-10 6V1z"/></svg>
+                </button>
+                <div class="voice-waveform">
+                  <div class="voice-bar played" style="height:30%"></div><div class="voice-bar played" style="height:55%"></div><div class="voice-bar played" style="height:80%"></div><div class="voice-bar played" style="height:65%"></div><div class="voice-bar played" style="height:40%"></div><div class="voice-bar played" style="height:90%"></div><div class="voice-bar played" style="height:70%"></div><div class="voice-bar played" style="height:50%"></div><div class="voice-bar" style="height:75%"></div><div class="voice-bar" style="height:45%"></div><div class="voice-bar" style="height:85%"></div><div class="voice-bar" style="height:60%"></div><div class="voice-bar" style="height:35%"></div><div class="voice-bar" style="height:70%"></div><div class="voice-bar" style="height:55%"></div><div class="voice-bar" style="height:80%"></div><div class="voice-bar" style="height:40%"></div><div class="voice-bar" style="height:65%"></div><div class="voice-bar" style="height:50%"></div><div class="voice-bar" style="height:30%"></div><div class="voice-bar" style="height:60%"></div><div class="voice-bar" style="height:75%"></div>
+                </div>
+                <span class="voice-dur">0:18</span>
+              </div>
+            </div>
+            <div class="bubble-meta"><span class="bubble-time">14:03</span></div>
+          </div>
+
+          <!-- Reply-quoted outgoing -->
+          <div class="msg out">
+            <div class="bubble">
+              <div class="reply-quote">
+                <div class="reply-quote-author">f7a23d91</div>
+                <div class="reply-quote-text">🎤 Nota de voz — 0:18</div>
+              </div>
+              Sí, estoy aquí. 3 saltos entre nosotros
+            </div>
+            <div class="bubble-meta">
+              <span class="bubble-time">14:04</span>
+              <span class="bubble-status"><svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="#3DBA52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg></span>
+            </div>
+          </div>
+
+          <!-- Incoming with reactions -->
+          <div class="msg in">
+            <div class="bubble">El mensaje llegó con 3 saltos. La red está funcionando bien 🍄</div>
+            <div class="bubble-meta"><span class="bubble-time">14:05</span></div>
+            <div class="reactions">
+              <span class="reaction-pill mine" onclick="this.classList.toggle('mine')">👍 <span class="reaction-count">2</span></span>
+              <span class="reaction-pill" onclick="this.classList.toggle('mine')">❤️ <span class="reaction-count">1</span></span>
+            </div>
+          </div>
+
+          <!-- Auto-destruct outgoing -->
+          <div class="msg out">
+            <div class="bubble">
+              <div class="destruct-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Se destruye en 1h
+              </div>
+              Punto de encuentro: plaza central a las 18h
+            </div>
+            <div class="bubble-meta">
+              <span class="bubble-time">14:06</span>
+              <span class="bubble-status"><svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg></span>
+            </div>
+          </div>
+
+          <div class="msg in">
+            <div class="bubble">Recibido. Nos vemos ahí.</div>
+            <div class="bubble-meta"><span class="bubble-time">14:07</span></div>
+          </div>
+        </div>
+
+        <!-- Voice recorder UI -->
+        <div class="voice-rec-ui" id="voice-rec-ui">
+          <div class="rec-dot"></div>
+          <div class="rec-bars">
+            <div class="rec-bar" style="height:35%"></div><div class="rec-bar" style="height:60%"></div><div class="rec-bar" style="height:80%"></div><div class="rec-bar" style="height:45%"></div><div class="rec-bar" style="height:70%"></div><div class="rec-bar" style="height:90%"></div><div class="rec-bar" style="height:55%"></div><div class="rec-bar" style="height:40%"></div><div class="rec-bar" style="height:75%"></div><div class="rec-bar" style="height:60%"></div><div class="rec-bar" style="height:85%"></div><div class="rec-bar" style="height:50%"></div>
+          </div>
+          <span class="rec-time">0:07</span>
+          <button class="rec-cancel" onclick="toggleVoiceRec()">Cancelar</button>
+          <button class="rec-send-v" onclick="toggleVoiceRec()">Enviar</button>
+        </div>
+
+        <div class="chat-input-area" id="chat-input-area">
+          <button class="input-action-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <input class="chat-input" placeholder="Escribe un mensaje…" id="chat-input-field" onkeydown="sendMsg(event)">
+          <button class="input-action-btn" onclick="toggleVoiceRec()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button class="send-btn" onclick="sendMsg({key:'Enter'})">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ NETWORK ═══ -->
+      <div class="screen" id="screen-network" style="background:var(--bg);flex-direction:column">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Red Myco</div>
+        </div>
+        <div class="network-content">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-val">3</div><div class="stat-label">Nodos cercanos</div></div>
+            <div class="stat-card"><div class="stat-val">7</div><div class="stat-label">En tránsito</div></div>
+          </div>
+          <div class="section-label">Topología de la red</div>
+          <div class="graph-card">
+            <canvas id="network-canvas" width="343" height="240"></canvas>
+          </div>
+          <div class="section-label">Nodos detectados</div>
+          <div class="node-list">
+            <div class="node-row"><div class="node-dot-green"></div><div class="node-id">f7a23d91</div><div class="node-rssi">-52 dBm</div></div>
+            <div class="node-row"><div class="node-dot-green"></div><div class="node-id">2b8e1c47</div><div class="node-rssi">-68 dBm</div></div>
+            <div class="node-row"><div class="node-dot-green"></div><div class="node-id">d9c04a12</div><div class="node-rssi">-74 dBm</div></div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn active" onclick="show('network')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div class="screen" id="screen-settings" style="background:var(--bg);flex-direction:column">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Ajustes</div>
+        </div>
+        <div class="settings-content">
+          <div>
+            <div class="settings-section-label">Mi identidad</div>
+            <div class="id-hero-card">
+              <div>
+                <div style="font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase">Tu ID en la red</div>
+                <div class="id-hero-val">a3f9b2c1</div>
+              </div>
+              <div class="id-hero-actions">
+                <button class="topbar-icon-btn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                </button>
+                <button class="topbar-icon-btn" onclick="show('qr')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 0v3m0-3h3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Seguridad</div>
+            <div class="settings-card">
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Bloqueo de app</div><div class="settings-sublabel">Requiere PIN o huella digital</div></div>
+                  <button class="toggle" id="lock-toggle" onclick="this.classList.toggle('off')"></button>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Huella digital</div><div class="settings-sublabel">Desbloquear con biometría</div></div>
+                  <button class="toggle" onclick="this.classList.toggle('off')"></button>
+                </div>
+              </div>
+              <div class="settings-item" style="cursor:pointer" onclick="show('blocked')">
+                <div class="settings-row">
+                  <div><div class="settings-label">Contactos bloqueados</div><div class="settings-sublabel">1 contacto bloqueado</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Notificaciones</div>
+            <div class="settings-card">
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">No molestar</div><div class="settings-sublabel">Silenciar notificaciones</div></div>
+                  <button class="toggle off" id="dnd-toggle" onclick="this.classList.toggle('off')"></button>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Horario silencio</div><div class="settings-sublabel">22:00 — 08:00</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Privacidad</div>
+            <div class="settings-card">
+              <div class="settings-item" style="cursor:pointer" onclick="show('privacy-data')">
+                <div class="settings-row">
+                  <div><div class="settings-label">Mis datos</div><div class="settings-sublabel">Qué almacena y comparte Myco</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+              <div class="settings-item" style="cursor:pointer" onclick="show('privacy-policy')">
+                <div class="settings-row">
+                  <div><div class="settings-label">Política de privacidad</div><div class="settings-sublabel">Términos legales de uso</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Apariencia</div>
+            <div class="settings-card">
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Tema claro</div><div class="settings-sublabel">Cambiar a modo claro</div></div>
+                  <button class="toggle off" onclick="this.classList.toggle('off')"></button>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Idioma</div></div>
+                  <span class="settings-value">Español</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Ayuda</div>
+            <div class="settings-card">
+              <div class="settings-item" style="cursor:pointer" onclick="show('about')">
+                <div class="settings-row">
+                  <div><div class="settings-label">Sobre Myco</div><div class="settings-sublabel">Versión, protocolo, créditos</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Reportar problema</div><div class="settings-sublabel">Enviar reporte por la red mesh</div></div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </div>
+              <div class="settings-item">
+                <button class="danger-btn">Borrar todos mis datos</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Red</div>
+            <div class="settings-card">
+              <div class="settings-item">
+                <div class="settings-row">
+                  <div><div class="settings-label">Retransmitir mensajes ajenos</div><div class="settings-sublabel">Ayuda a otros a través de tu nodo</div></div>
+                  <button class="toggle" id="relay-toggle" onclick="toggleRelay()"></button>
+                </div>
+              </div>
+              <div class="settings-item"><button class="danger-btn">Limpiar mensajes en tránsito</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="settings-section-label">Identidad</div>
+            <div class="settings-card">
+              <div style="padding:14px 18px">
+                <div class="info-row"><span class="info-label">Versión</span><span class="info-val">1.0.0</span></div>
+                <div class="info-row"><span class="info-label">Protocolo</span><span class="info-val">Myco v1.0</span></div>
+                <div class="info-row"><span class="info-label">Saltos máximos</span><span class="info-val">15</span></div>
+                <div class="info-row"><span class="info-label">TTL mensajes</span><span class="info-val">24 horas</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn" onclick="show('network')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn active" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+      <!-- ═══ QR ═══ -->
+      <div class="screen qr-screen" id="screen-qr">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('settings')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Mi código QR</div>
+        </div>
+        <div class="qr-content">
+          <div class="qr-sub">Comparte este código con<br>otros usuarios de Myco</div>
+          <div class="qr-box"><canvas id="qr-canvas" width="208" height="208"></canvas></div>
+          <div style="text-align:center">
+            <div class="qr-id-label">Tu ID en la red</div>
+            <div class="qr-id-val">a3f9b2c1</div>
+          </div>
+          <!-- Copyable link -->
+          <div class="qr-link-row">
+            <div class="qr-link-box" id="qr-link-text">myco://a3f9b2c1</div>
+            <button class="qr-copy-btn" onclick="copyQrLink()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar
+            </button>
+          </div>
+          <!-- Actions -->
+          <div class="qr-actions-row">
+            <button class="qr-action-btn" onclick="downloadQr()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar PNG
+            </button>
+            <button class="qr-action-btn" onclick="shareQr()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PERMISSIONS ONBOARDING ═══ -->
+      <div class="screen perm-screen-inner" id="screen-permissions">
+        <div class="perm-step-dots">
+          <div class="perm-step-dot active" id="perm-dot-0"></div>
+          <div class="perm-step-dot" id="perm-dot-1"></div>
+          <div class="perm-step-dot" id="perm-dot-2"></div>
+        </div>
+        <div class="perm-icon-wrap" id="perm-icon">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-3"/><path d="M8 2v4h8V2"/><path d="M16 2h3a2 2 0 012 2v2"/><circle cx="12" cy="14" r="2"/><line x1="12" y1="10" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+        </div>
+        <div class="perm-title" id="perm-title">Bluetooth LE</div>
+        <div class="perm-desc" id="perm-desc">Myco usa Bluetooth Low Energy para descubrir nodos cercanos y transmitir mensajes sin internet. Esta es la base de la red mesh.</div>
+        <div class="perm-why">
+          <div class="perm-why-lbl">Por qué lo necesitamos</div>
+          <div class="perm-why-text" id="perm-why">Sin acceso a Bluetooth, Myco no puede comunicarse con ningún nodo. No enviamos datos a servidores externos.</div>
+        </div>
+        <button class="perm-allow-btn" onclick="nextPerm()">Permitir acceso</button>
+        <div class="perm-skip" onclick="nextPerm()">Saltar por ahora</div>
+      </div>
+
+      <!-- ═══ LOCK SCREEN ═══ -->
+      <div class="screen lock-screen-inner" id="screen-lock">
+        <canvas id="lock-logo-canvas" width="72" height="72" style="opacity:.45"></canvas>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:5px">Myco bloqueado</div>
+          <div class="lock-bio-lbl">Introduce tu PIN para continuar</div>
+        </div>
+        <div class="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="numpad">
+          <button class="numpad-key" onclick="pinPress(1)"><span>1</span></button>
+          <button class="numpad-key" onclick="pinPress(2)"><span>2</span><span class="numpad-key-sub">ABC</span></button>
+          <button class="numpad-key" onclick="pinPress(3)"><span>3</span><span class="numpad-key-sub">DEF</span></button>
+          <button class="numpad-key" onclick="pinPress(4)"><span>4</span><span class="numpad-key-sub">GHI</span></button>
+          <button class="numpad-key" onclick="pinPress(5)"><span>5</span><span class="numpad-key-sub">JKL</span></button>
+          <button class="numpad-key" onclick="pinPress(6)"><span>6</span><span class="numpad-key-sub">MNO</span></button>
+          <button class="numpad-key" onclick="pinPress(7)"><span>7</span><span class="numpad-key-sub">PQRS</span></button>
+          <button class="numpad-key" onclick="pinPress(8)"><span>8</span><span class="numpad-key-sub">TUV</span></button>
+          <button class="numpad-key" onclick="pinPress(9)"><span>9</span><span class="numpad-key-sub">WXYZ</span></button>
+          <div class="lock-bio-wrap" style="align-self:center">
+            <button class="lock-bio-btn">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 10a2 2 0 00-2 2v2"/><path d="M6 14a6 6 0 0012 0v-2a6 6 0 00-9.33-4.98"/><path d="M3 8c0-4.97 4.03-9 9-9s9 4.03 9 9v6a9 9 0 01-18 0V8z"/></svg>
+            </button>
+          </div>
+          <button class="numpad-key" onclick="pinPress(0)"><span>0</span></button>
+          <button class="numpad-key special" onclick="pinDelete()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ CREATE GROUP ═══ -->
+      <div class="screen" id="screen-create-group" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Nuevo grupo</div>
+          <div class="topbar-actions">
+            <span style="font-size:12px;color:var(--text3);align-self:center;padding-right:4px">2 sel.</span>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding-top:16px">
+          <div style="padding:0 20px 20px">
+            <div class="group-input-wrap">
+              <div class="av av-group" style="width:40px;height:40px;font-size:11px;flex-shrink:0">GRP</div>
+              <input class="group-input" placeholder="Nombre del grupo…" value="Zona Norte">
+            </div>
+            <div class="settings-section-label" style="margin-bottom:10px">Selecciona contactos</div>
+          </div>
+          <div class="contact-check-row" onclick="this.querySelector('.contact-checkbox').classList.toggle('checked')">
+            <div class="contact-checkbox checked">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="av av-a">f7a2</div>
+            <div class="chat-info">
+              <div class="chat-name">f7a23d91</div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">ID: f7a23d91</div>
+            </div>
+          </div>
+          <div class="contact-check-row" onclick="this.querySelector('.contact-checkbox').classList.toggle('checked')">
+            <div class="contact-checkbox checked">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="av av-b">2b</div>
+            <div class="chat-info">
+              <div class="chat-name">2b8e1c47</div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">ID: 2b8e1c47</div>
+            </div>
+          </div>
+          <div class="contact-check-row" onclick="this.querySelector('.contact-checkbox').classList.toggle('checked')">
+            <div class="contact-checkbox">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="av av-c">d9</div>
+            <div class="chat-info">
+              <div class="chat-name">d9c04a12</div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">ID: d9c04a12</div>
+            </div>
+          </div>
+        </div>
+        <div class="create-group-footer">
+          <button class="create-group-btn" onclick="show('group-chat')">Crear grupo (2 miembros)</button>
+        </div>
+      </div>
+
+      <!-- ═══ GROUP CHAT ═══ -->
+      <div class="screen chat-screen" id="screen-group-chat">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="av av-group" style="width:36px;height:36px;font-size:11px;flex-shrink:0">GRP</div>
+          <div style="flex:1">
+            <div class="chat-topbar-name">Zona Norte 🌿</div>
+            <div class="chat-topbar-sub">4 miembros · 2 en línea</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="topbar-icon-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="messages-area">
+          <div class="date-sep"><div class="date-sep-line"></div><span class="date-sep-txt">Hoy</span><div class="date-sep-line"></div></div>
+          <div class="msg in">
+            <div class="sender-name">f7a23d91 <span class="group-admin-badge">ADMIN</span></div>
+            <div class="bubble">Grupo creado. Coordinaremos aquí.</div>
+            <div class="bubble-meta"><span class="bubble-time">13:45</span></div>
+          </div>
+          <div class="msg in">
+            <div class="sender-name">2b8e1c47</div>
+            <div class="bubble"><span class="mention">@a3f9b2c1</span> ¿puedes confirmar tu posición?</div>
+            <div class="bubble-meta"><span class="bubble-time">13:52</span></div>
+          </div>
+          <div class="msg out">
+            <div class="bubble">Confirmado. Estoy en el sector B. 3 saltos hasta el grupo.</div>
+            <div class="bubble-meta">
+              <span class="bubble-time">13:54</span>
+              <span class="bubble-status"><svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="#3DBA52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg></span>
+            </div>
+          </div>
+          <div class="msg in">
+            <div class="sender-name">f7a23d91</div>
+            <div class="bubble">
+              <div class="voice-bubble-body">
+                <button class="voice-play"><svg width="11" height="13" viewBox="0 0 12 14" fill="currentColor"><path d="M1 1l10 6-10 6V1z"/></svg></button>
+                <div class="voice-waveform">
+                  <div class="voice-bar" style="height:40%"></div><div class="voice-bar" style="height:70%"></div><div class="voice-bar" style="height:55%"></div><div class="voice-bar" style="height:85%"></div><div class="voice-bar" style="height:45%"></div><div class="voice-bar" style="height:60%"></div><div class="voice-bar" style="height:75%"></div><div class="voice-bar" style="height:50%"></div><div class="voice-bar" style="height:80%"></div><div class="voice-bar" style="height:35%"></div><div class="voice-bar" style="height:65%"></div>
+                </div>
+                <span class="voice-dur">0:08</span>
+              </div>
+            </div>
+            <div class="bubble-meta"><span class="bubble-time">13:59</span></div>
+          </div>
+          <div class="msg in">
+            <div class="sender-name">d9c04a12</div>
+            <div class="bubble">Nos reunimos en punto sur a las 17h.</div>
+            <div class="bubble-meta"><span class="bubble-time">14:10</span></div>
+            <div class="reactions"><span class="reaction-pill mine">👍 <span class="reaction-count">3</span></span></div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <button class="input-action-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <input class="chat-input" placeholder="Mensaje al grupo…">
+          <button class="send-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ NETWORK HISTORY (24h) ═══ -->
+      <div class="screen" id="screen-network-history" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('network')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Historial de nodos — 24h</div>
+        </div>
+        <div style="padding:10px 16px 0;flex-shrink:0">
+          <div class="stats-row" style="margin-bottom:10px">
+            <div class="stat-card"><div class="stat-val">8</div><div class="stat-label">Nodos vistos</div></div>
+            <div class="stat-card"><div class="stat-val">3</div><div class="stat-label">En línea ahora</div></div>
+          </div>
+        </div>
+        <div class="history-list">
+          <div class="tl-item">
+            <div class="tl-dot app"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">f7a23d91</div>
+              <div class="tl-action app">Apareció en la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 14 min</span>
+                <span class="tl-rssi">-52 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot app"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">2b8e1c47</div>
+              <div class="tl-action app">Apareció en la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 1h</span>
+                <span class="tl-rssi">-68 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot dis"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">88f1e920</div>
+              <div class="tl-action dis">Desapareció de la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 2h</span>
+                <span class="tl-rssi">último: -81 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot app"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">d9c04a12</div>
+              <div class="tl-action app">Apareció en la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 3h</span>
+                <span class="tl-rssi">-74 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot dis"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">c1b04de3</div>
+              <div class="tl-action dis">Desapareció de la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 5h</span>
+                <span class="tl-rssi">último: -77 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot app"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">7e3a9f01</div>
+              <div class="tl-action app">Apareció en la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 7h</span>
+                <span class="tl-rssi">-61 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot dis"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">f7a23d91</div>
+              <div class="tl-action dis">Desapareció de la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 9h</span>
+                <span class="tl-rssi">último: -58 dBm</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot app"></div>
+            <div class="tl-body">
+              <div class="tl-nodeid">a0e2c8b5</div>
+              <div class="tl-action app">Apareció en la red</div>
+              <div style="display:flex;justify-content:space-between;margin-top:2px">
+                <span class="tl-time">hace 14h</span>
+                <span class="tl-rssi">-71 dBm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn active" onclick="show('network-history')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+      <!-- ═══ HEATMAP ═══ -->
+      <div class="screen" id="screen-heatmap" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('network')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Mapa de actividad</div>
+        </div>
+        <div class="network-content">
+          <div class="section-label">Densidad de nodos — últimas 24h</div>
+          <div class="heatmap-canvas-wrap">
+            <canvas id="heatmap-canvas" width="343" height="200"></canvas>
+          </div>
+          <div class="heatmap-legend">
+            <span class="heatmap-legend-lbl">Baja</span>
+            <div class="heatmap-legend-bar"></div>
+            <span class="heatmap-legend-lbl">Alta</span>
+          </div>
+          <div class="section-label">Probabilidad de entrega</div>
+          <div class="stat-card" style="text-align:left;padding:18px">
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px">
+              <span class="prob-big">87%</span>
+              <span style="font-size:12px;color:var(--text2)">con 3 nodos activos</span>
+            </div>
+            <div class="delivery-prob-bar"><div class="delivery-prob-fill" style="width:87%"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <span style="font-size:11px;color:var(--text3)">Saltos estimados: 3</span>
+              <span style="font-size:11px;color:var(--text3)">TTL: 24h</span>
+            </div>
+          </div>
+          <div class="section-label">Estadísticas</div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-val">8</div><div class="stat-label">Nodos/24h</div></div>
+            <div class="stat-card"><div class="stat-val">94</div><div class="stat-label">Mensajes relay</div></div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn active" onclick="show('heatmap')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+      <!-- ═══ PING TEST ═══ -->
+      <div class="screen" id="screen-ping" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('network')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Ping de diagnóstico</div>
+          <div class="topbar-actions">
+            <button class="topbar-icon-btn" onclick="startPingAnim()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="network-content">
+          <div class="search-bar" style="margin-bottom:0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/></svg>
+            <input class="search-input" placeholder="ID del nodo destino…" value="f7a23d91">
+          </div>
+          <div class="section-label">Ruta detectada</div>
+          <div class="ping-chain" id="ping-chain">
+            <div class="ping-node-wrap">
+              <div class="ping-node-circle me">a3f9<br>b2c1</div>
+              <div class="ping-node-lbl">Tú</div>
+            </div>
+            <div class="ping-connector">
+              <div class="ping-line"></div>
+              <div class="ping-hop-badge" id="hop1-badge" style="opacity:.4">Hop 1 · 82ms</div>
+              <div class="ping-line"></div>
+            </div>
+            <div class="ping-node-wrap">
+              <div class="ping-node-circle" id="hop1-node" style="opacity:.4">2b8e<br>1c47</div>
+              <div class="ping-node-lbl" style="opacity:.4">Nodo relay</div>
+            </div>
+            <div class="ping-connector">
+              <div class="ping-line" style="opacity:.3"></div>
+              <div class="ping-hop-badge" id="hop2-badge" style="opacity:.2">Hop 2 · 154ms</div>
+              <div class="ping-line" style="opacity:.3"></div>
+            </div>
+            <div class="ping-node-wrap">
+              <div class="ping-node-circle" id="hop2-node" style="opacity:.25">d9c0<br>4a12</div>
+              <div class="ping-node-lbl" style="opacity:.25">Nodo relay</div>
+            </div>
+            <div class="ping-connector">
+              <div class="ping-line" style="opacity:.2"></div>
+              <div class="ping-hop-badge" id="hop3-badge" style="opacity:.15">Hop 3 · 104ms</div>
+              <div class="ping-line" style="opacity:.2"></div>
+            </div>
+            <div class="ping-node-wrap">
+              <div class="ping-node-circle target" id="target-node" style="opacity:.2">f7a2<br>3d91</div>
+              <div class="ping-node-lbl" id="target-lbl" style="opacity:.2">Destino</div>
+            </div>
+          </div>
+          <div class="ping-result-card">
+            <div class="ping-metric-val" id="ping-val">—</div>
+            <div class="ping-metric-unit">latencia total</div>
+            <div style="display:flex;justify-content:space-around;margin-top:12px">
+              <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--text)" id="ping-hops">—</div><div style="font-size:11px;color:var(--text2);margin-top:2px">saltos</div></div>
+              <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--text)" id="ping-sent">1</div><div style="font-size:11px;color:var(--text2);margin-top:2px">enviados</div></div>
+              <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--green)" id="ping-recv">—</div><div style="font-size:11px;color:var(--text2);margin-top:2px">recibidos</div></div>
+            </div>
+          </div>
+          <button class="btn-primary" style="margin-top:0" onclick="startPingAnim()">Enviar ping</button>
+        </div>
+      </div>
+
+      <!-- ═══ ABOUT ═══ -->
+      <div class="screen" id="screen-about" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('settings')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Sobre Myco</div>
+        </div>
+        <div class="about-content">
+          <div class="about-hero">
+            <canvas id="about-logo-canvas" width="88" height="88"></canvas>
+            <div style="font-size:26px;font-weight:900;letter-spacing:10px;background:linear-gradient(135deg,#3DBA52,#7ed88f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">MYCO</div>
+            <div class="about-version-badge">v1.0.0</div>
+            <div style="font-size:12px;color:var(--text2);text-align:center;line-height:1.7;margin-top:4px">Red mesh descentralizada · Sin internet · Sin servidores</div>
+          </div>
+          <div class="settings-card">
+            <div class="about-item">
+              <div class="about-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div>
+              <div><div class="about-item-lbl">Protocolo</div><div class="about-item-val">Myco v1.0 — BLE Mesh</div></div>
+            </div>
+            <div class="about-item">
+              <div class="about-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+              <div><div class="about-item-lbl">Cifrado</div><div class="about-item-val">ECDH P-256 + AES-256-GCM</div></div>
+            </div>
+            <div class="about-item">
+              <div class="about-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+              <div><div class="about-item-lbl">Firma digital</div><div class="about-item-val">ECDSA SHA-256</div></div>
+            </div>
+            <div class="about-item">
+              <div class="about-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+              <div><div class="about-item-lbl">Saltos máximos</div><div class="about-item-val">15 nodos · TTL 24h</div></div>
+            </div>
+            <div class="about-item">
+              <div class="about-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+              <div><div class="about-item-lbl">Plataforma</div><div class="about-item-val">Android 8.0+ (API 26)</div></div>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="batalla-credit">
+              <div class="batalla-top">Desarrollado por</div>
+              <div class="batalla-name"><span>Batalla</span> Group</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PRIVACY POLICY ═══ -->
+      <div class="screen" id="screen-privacy-policy" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('settings')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Política de privacidad</div>
+        </div>
+        <div class="policy-content">
+          <div class="policy-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Sin servidores · Sin rastreo · 100% local
+          </div>
+          <div class="policy-section">
+            <div class="policy-section-title">1. Datos que almacenamos</div>
+            <div class="policy-text">Myco almacena únicamente en tu dispositivo: tu par de claves criptográficas (privada y pública), los mensajes de tus conversaciones y el historial de nodos detectados. Nada sale de tu dispositivo hacia servidores externos.</div>
+          </div>
+          <div class="policy-section">
+            <div class="policy-section-title">2. Datos que NO almacenamos</div>
+            <div class="policy-text">No recopilamos nombre, teléfono, correo, ubicación GPS, ni ningún identificador personal. Tu identidad en la red es un hash criptográfico generado localmente.</div>
+          </div>
+          <div class="policy-section">
+            <div class="policy-section-title">3. Retransmisión de mensajes</div>
+            <div class="policy-text">Si activas el relay, tu dispositivo retransmitirá paquetes cifrados de otros usuarios. Estos paquetes son completamente opacos para ti: no puedes leer su contenido. Se eliminan automáticamente tras 24 horas.</div>
+          </div>
+          <div class="policy-section">
+            <div class="policy-section-title">4. Cifrado</div>
+            <div class="policy-text">Todos los mensajes están cifrados con AES-256-GCM usando claves derivadas con ECDH P-256. Incluso los nodos relay intermedios no pueden descifrar el contenido.</div>
+          </div>
+          <div class="policy-section">
+            <div class="policy-section-title">5. Actualizaciones</div>
+            <div class="policy-text">Esta política puede actualizarse con nuevas versiones de la app. Los cambios sustanciales serán notificados en la pantalla de onboarding.</div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Última actualización: junio 2026 · Batalla Group</div>
+        </div>
+      </div>
+
+      <!-- ═══ BLOCKED CONTACTS ═══ -->
+      <div class="screen" id="screen-blocked" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('settings')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Contactos bloqueados</div>
+        </div>
+        <div style="flex:1;overflow-y:auto">
+          <div class="blocked-row">
+            <div class="av av-d">88</div>
+            <div class="chat-info">
+              <div class="chat-name">88f1e920</div>
+              <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">Bloqueado hace 2 días</div>
+            </div>
+            <button class="unblock-btn" onclick="this.closest('.blocked-row').style.opacity='.3'">Desbloquear</button>
+          </div>
+          <div style="padding:28px 20px;text-align:center">
+            <div style="font-size:12px;color:var(--text3);line-height:1.7">Los usuarios bloqueados no pueden enviarte mensajes ni ver tu presencia en la red.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PRIVACY DATA ═══ -->
+      <div class="screen" id="screen-privacy-data" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('settings')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="topbar-title">Mis datos</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px">
+          <div class="policy-badge" style="width:100%;justify-content:center;margin-bottom:18px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Todo queda en tu dispositivo
+          </div>
+          <div class="settings-card">
+            <div class="data-cols">
+              <div class="data-col">
+                <div class="data-col-hdr yes">Guardamos</div>
+                <div class="data-item"><div class="data-item-dot yes"></div>Claves criptográficas locales</div>
+                <div class="data-item"><div class="data-item-dot yes"></div>Mensajes de tus chats</div>
+                <div class="data-item"><div class="data-item-dot yes"></div>Historial de nodos (24h)</div>
+                <div class="data-item"><div class="data-item-dot yes"></div>Contactos guardados</div>
+                <div class="data-item"><div class="data-item-dot yes"></div>Configuración de la app</div>
+              </div>
+              <div class="data-col">
+                <div class="data-col-hdr no">No guardamos</div>
+                <div class="data-item"><div class="data-item-dot no"></div>Nombre o teléfono</div>
+                <div class="data-item"><div class="data-item-dot no"></div>Ubicación GPS</div>
+                <div class="data-item"><div class="data-item-dot no"></div>Metadatos de uso</div>
+                <div class="data-item"><div class="data-item-dot no"></div>Datos en la nube</div>
+                <div class="data-item"><div class="data-item-dot no"></div>Análisis de comportamiento</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="settings-section-label">Tus datos locales</div>
+            <div class="settings-card">
+              <div class="settings-item"><div class="settings-row"><span class="settings-label">Mensajes almacenados</span><span class="settings-value">143</span></div></div>
+              <div class="settings-item"><div class="settings-row"><span class="settings-label">Nodos en historial</span><span class="settings-value">8</span></div></div>
+              <div class="settings-item"><div class="settings-row"><span class="settings-label">Tamaño total</span><span class="settings-value">1.2 MB</span></div></div>
+              <div class="settings-item"><button class="danger-btn">Eliminar todos mis datos locales</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ GLOBAL SEARCH ═══ -->
+      <div class="screen" id="screen-search" style="background:var(--bg)">
+        <div class="topbar">
+          <button class="topbar-back" onclick="show('chats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div style="flex:1">
+            <div class="search-bar" style="margin-bottom:0;padding:8px 14px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" placeholder="Buscar mensajes…" value="zona norte" autofocus>
+            </div>
+          </div>
+        </div>
+        <div class="search-filters">
+          <button class="search-filter active">Todo</button>
+          <button class="search-filter" onclick="setFilter(this)">Mensajes</button>
+          <button class="search-filter" onclick="setFilter(this)">Contactos</button>
+          <button class="search-filter" onclick="setFilter(this)">Grupos</button>
+        </div>
+        <div class="search-results-area">
+          <div class="search-result-group">
+            <div class="search-group-lbl">Mensajes</div>
+            <div class="search-result-row" onclick="show('chat')">
+              <div class="av av-a" style="width:38px;height:38px;font-size:11px;flex-shrink:0">f7a2</div>
+              <div>
+                <div class="search-result-text">¿Sigues en la <span class="search-highlight">zona norte</span>?</div>
+                <div class="search-result-sub">f7a23d91 · hace 14 min</div>
+              </div>
+            </div>
+            <div class="search-result-row" onclick="show('group-chat')">
+              <div class="av av-group" style="width:38px;height:38px;font-size:10px;flex-shrink:0">GRP</div>
+              <div>
+                <div class="search-result-text">Nos reunimos en punto sur — <span class="search-highlight">zona norte</span> confirmada</div>
+                <div class="search-result-sub">Zona Norte · hace 10 min</div>
+              </div>
+            </div>
+            <div class="search-result-row" onclick="show('chat')">
+              <div class="av av-b" style="width:38px;height:38px;font-size:11px;flex-shrink:0">2b</div>
+              <div>
+                <div class="search-result-text">Recibido. Nos vemos en la <span class="search-highlight">zona norte</span>.</div>
+                <div class="search-result-sub">2b8e1c47 · hace 1h</div>
+              </div>
+            </div>
+          </div>
+          <div class="search-result-group">
+            <div class="search-group-lbl">Grupos</div>
+            <div class="search-result-row" onclick="show('group-chat')">
+              <div class="av av-group" style="width:38px;height:38px;font-size:10px;flex-shrink:0">GRP</div>
+              <div>
+                <div class="search-result-text"><span class="search-highlight">Zona Norte</span> 🌿</div>
+                <div class="search-result-sub">4 miembros · activo hace 10 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottombar">
+          <button class="tab-btn active" onclick="show('chats')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="tab-label">Chats</span></button>
+          <button class="tab-btn" onclick="show('contacts')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><span class="tab-label">Contactos</span></button>
+          <button class="tab-btn" onclick="show('network')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7m7-7a5 5 0 010 7"/><path d="M5 5a10 10 0 000 14m14-14a10 10 0 010 14"/></svg></div><span class="tab-label">Red</span></button>
+          <button class="tab-btn" onclick="show('settings')"><div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg></div><span class="tab-label">Ajustes</span></button>
+        </div>
+      </div>
+
+    </div><!-- phone-screen -->
+  </div><!-- phone-frame -->
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">Protocolo Myco v1.0</div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Transporte:</strong> Bluetooth LE advertising + GATT</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Cifrado:</strong> ECDH P-256 + AES-256-GCM</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Firma:</strong> ECDSA SHA-256</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Saltos máx:</strong> 15 nodos</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>TTL:</strong> 24 horas automático</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Anti-loop:</strong> caché de IDs procesados</div></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Paleta de colores</div>
+      <div class="palette">
+        <div class="palette-row"><div class="palette-chip" style="background:#3DBA52"></div><div class="palette-info"><span>#3DBA52</span> — Verde Myco</div></div>
+        <div class="palette-row"><div class="palette-chip" style="background:#1a4d24"></div><div class="palette-info"><span>#1a4d24</span> — Verde profundo</div></div>
+        <div class="palette-row"><div class="palette-chip" style="background:#080808;border:1px solid #222"></div><div class="palette-info"><span>#080808</span> — Negro fondo</div></div>
+        <div class="palette-row"><div class="palette-chip" style="background:#101010"></div><div class="palette-info"><span>#101010</span> — Superficie</div></div>
+        <div class="palette-row"><div class="palette-chip" style="background:#1e1e1e"></div><div class="palette-info"><span>#1e1e1e</span> — Superficie 2</div></div>
+      </div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Stack técnico</div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Kotlin</strong> 1.9 + Coroutines</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Jetpack Compose</strong> + Material 3</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>Hilt</strong> DI + <strong>Room</strong> DB</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text"><strong>MVVM</strong> + Clean Architecture</div></div>
+      <div class="sidebar-item"><div class="sidebar-dot"></div><div class="sidebar-text">Min SDK <strong>Android 8.0</strong> (API 26)</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentScreen = 'splash';
+let obPage = 0;
+let relayOn = true;
+let netRaf = null;
+let permStep = 0;
+let pinDigits = 0;
+let pingRunning = false;
+
+const obPages = [
+  { emoji:'🍄', title:'Bienvenido a Myco', sub:'La red que vive entre los teléfonos',
+    desc:'Myco es una red de mensajería descentralizada. Tus mensajes viajan de teléfono en teléfono como el micelio de los hongos, sin necesitar internet ni cobertura móvil.' },
+  { emoji:'📡', title:'Sin internet', sub:'Sin servidores. Sin rastreo.',
+    desc:'Myco usa Bluetooth LE para crear una red mesh local. Los mensajes saltan hasta 15 nodos para llegar a su destino. No hay servidores centrales que puedan ser hackeados o censurados.' },
+  { emoji:'🔐', title:'Tu identidad es tuya', sub:'Criptografía de extremo a extremo',
+    desc:'Myco genera un par de claves criptográficas únicas en tu dispositivo. Solo tú puedes leer tus mensajes. Ni siquiera los nodos que los retransmiten pueden verlos.' },
+  { emoji:'⚠️', title:'Aviso legal', sub:'Léelo antes de continuar', desc:'' }
+];
+
+// SVG status icons
+const STATUS = {
+  read:      `<svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="#3DBA52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg>`,
+  delivered: `<svg width="18" height="11" viewBox="0 0 22 13" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 8-8"/><path d="M9 7l4 4 8-8"/></svg>`,
+  sent:      `<svg width="13" height="11" viewBox="0 0 14 12" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6l4 4 8-8"/></svg>`,
+  pending:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 3"/></svg>`,
+};
+
+function show(name) {
+  const cur  = document.querySelector('.screen.active');
+  const next = document.getElementById('screen-' + name);
+  if (!next || cur === next) return;
+
+  if (cur) {
+    cur.style.animation = 'scrOut .18s ease forwards';
+    setTimeout(() => { cur.style.animation = ''; cur.classList.remove('active'); }, 180);
+  }
+  setTimeout(() => {
+    next.classList.add('active');
+    next.style.animation = 'scrIn .3s cubic-bezier(.22,1,.36,1) forwards';
+    setTimeout(() => { next.style.animation = ''; }, 360);
+  }, cur ? 120 : 0);
+
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const fn = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', fn.includes(`'${name}'`));
+  });
+  currentScreen = name;
+  if (name === 'network') startNet(); else stopNet();
+  if (name === 'qr') setTimeout(drawQr, 60);
+  if (name === 'heatmap') setTimeout(drawHeatmap, 80);
+  if (name === 'about') setTimeout(drawAboutLogo, 60);
+}
+
+function nextOb() {
+  if (obPage < 3) { obPage++; updateOb(); }
+  else { show('identity'); obPage = 0; updateOb(); }
+}
+
+function checkLegal() {
+  const cb = document.getElementById('accept-cb');
+  document.getElementById('ob-btn').disabled = !cb.checked;
+  document.getElementById('ob-btn').style.opacity = cb.checked ? '1' : '.4';
+}
+
+function updateOb() {
+  const p = obPages[obPage];
+  document.getElementById('ob-emoji').textContent = p.emoji;
+  document.getElementById('ob-title').textContent = p.title;
+  document.getElementById('ob-sub').textContent   = p.sub;
+  document.getElementById('ob-desc').textContent  = p.desc;
+  document.getElementById('ob-desc').style.display   = obPage < 3 ? '' : 'none';
+  document.getElementById('legal-section').style.display = obPage === 3 ? '' : 'none';
+  document.getElementById('ob-btn').textContent = obPage < 3 ? 'Continuar' : 'Entiendo y acepto';
+  if (obPage === 3) {
+    document.getElementById('ob-btn').disabled = true;
+    document.getElementById('ob-btn').style.opacity = '.4';
+    document.getElementById('accept-cb').checked = false;
+  } else {
+    document.getElementById('ob-btn').disabled = false;
+    document.getElementById('ob-btn').style.opacity = '1';
+  }
+  [0,1,2,3].forEach(i => document.getElementById('dot'+i).classList.toggle('active', i === obPage));
+}
+
+function toggleRelay() {
+  relayOn = !relayOn;
+  document.getElementById('relay-toggle').classList.toggle('off', !relayOn);
+}
+
+function sendMsg(e) {
+  if (e.key !== 'Enter') return;
+  const input = document.getElementById('chat-input-field');
+  const text  = input.value.trim();
+  if (!text) return;
+  const area = document.getElementById('messages-area');
+  const div  = document.createElement('div');
+  div.className = 'msg out msg-new';
+  const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  div.innerHTML = `
+    <div class="bubble">${text}</div>
+    <div class="bubble-meta">
+      <span class="bubble-time">${t}</span>
+      <span class="bubble-status" id="bs-${Date.now()}">${STATUS.pending}</span>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  input.value = '';
+  const bs = div.querySelector('.bubble-status');
+  setTimeout(() => { bs.innerHTML = STATUS.sent; }, 800);
+  setTimeout(() => { bs.innerHTML = STATUS.delivered; }, 3000);
+  setTimeout(() => { bs.innerHTML = STATUS.read; }, 7000);
+}
+
+// Logo canvas
+function drawLogo() {
+  const c = document.getElementById('logo-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = 140, H = 140, cx = W/2, cy = H/2;
+  ctx.clearRect(0, 0, W, H);
+  const nodes = [
+    [cx,cy],[cx-40,cy-34],[cx+40,cy-34],[cx-50,cy+8],[cx+50,cy+8],
+    [cx-22,cy+46],[cx+22,cy+46],[cx,cy-54],[cx+26,cy-10],[cx-26,cy+14]
+  ];
+  const conns = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,7],[2,7],[1,3],[2,4],[0,8],[0,9],[8,2],[9,5]];
+  ctx.lineCap = 'round';
+  conns.forEach(([a,b], i) => {
+    ctx.strokeStyle = i < 6 ? 'rgba(26,77,36,.8)' : 'rgba(26,77,36,.35)';
+    ctx.lineWidth   = i < 6 ? 2.5 : 1.5;
+    ctx.beginPath(); ctx.moveTo(nodes[a][0], nodes[a][1]); ctx.lineTo(nodes[b][0], nodes[b][1]); ctx.stroke();
+  });
+  nodes.forEach(([x,y], i) => {
+    const r = i===0?8:i<3?5.5:4;
+    ctx.beginPath(); ctx.arc(x,y,r*2.2,0,Math.PI*2); ctx.fillStyle='rgba(26,77,36,.22)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle='#3DBA52'; ctx.fill();
+  });
+}
+
+// Animated network graph
+let netT = 0;
+function startNet() {
+  stopNet();
+  function frame() { netT += .018; drawNet(netT); netRaf = requestAnimationFrame(frame); }
+  netRaf = requestAnimationFrame(frame);
+}
+function stopNet() { if (netRaf) { cancelAnimationFrame(netRaf); netRaf = null; } }
+
+function drawNet(t) {
+  const c = document.getElementById('network-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W=343, H=240, cx=W/2, cy=H/2, R=82;
+  ctx.clearRect(0,0,W,H);
+
+  const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,90);
+  grd.addColorStop(0,'rgba(26,77,36,.08)'); grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+
+  const ext = [0,1,2].map(i => {
+    const base = -Math.PI/2 + i*2.094;
+    const w = Math.sin(t + i*1.2)*5;
+    return [cx+(R+w)*Math.cos(base), cy+(R+w)*Math.sin(base)];
+  });
+
+  ext.forEach(([x,y], i) => {
+    const p = (Math.sin(t*2+i)+1)/2;
+    ctx.strokeStyle = `rgba(61,186,82,${.15+p*.22})`;
+    ctx.lineWidth = 1.5+p*.7; ctx.lineCap='round';
+    ctx.setLineDash([4,6]); ctx.lineDashOffset = -t*12;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  ext.forEach(([x,y],i) => {
+    const f = ((t*.55+i*.33)%1);
+    const px=cx+(x-cx)*f, py=cy+(y-cy)*f;
+    ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+    ctx.fillStyle=`rgba(61,186,82,${1-f})`; ctx.fill();
+  });
+
+  const p0 = (Math.sin(t*1.5)+1)/2;
+  ctx.beginPath(); ctx.arc(cx,cy,26+p0*4,0,Math.PI*2); ctx.fillStyle='rgba(61,186,82,.06)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,17,0,Math.PI*2); ctx.fillStyle='rgba(61,186,82,.12)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2); ctx.fillStyle='#3DBA52'; ctx.fill();
+
+  ext.forEach(([x,y],i) => {
+    const p=(Math.sin(t*1.8+i*.9)+1)/2;
+    ctx.beginPath(); ctx.arc(x,y,16+p*4,0,Math.PI*2); ctx.fillStyle='rgba(26,77,36,.18)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2); ctx.fillStyle=`rgba(61,186,82,${.75+p*.25})`; ctx.fill();
+  });
+
+  ctx.fillStyle='rgba(90,90,90,.7)'; ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillText('f7a23d91',ext[0][0]-36,ext[0][1]-14);
+  ctx.fillText('2b8e1c47',ext[1][0]+10,ext[1][1]+4);
+  ctx.fillText('d9c04a12',ext[2][0]-36,ext[2][1]+16);
+  ctx.fillStyle='#3DBA52'; ctx.font='bold 11px JetBrains Mono,monospace';
+  ctx.fillText('a3f9b2c1',cx-28,cy-16);
+}
+
+function drawQr() {
+  const c = document.getElementById('qr-canvas');
+  if (!c) return;
+  const ctx=c.getContext('2d'), S=208, cell=8, cols=S/cell;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,S,S);
+  let seed=12345;
+  const rand=()=>{ seed=(seed*1664525+1013904223)&0xFFFFFFFF; return (seed>>>0)/0xFFFFFFFF; };
+  [[0,0],[cols-7,0],[0,cols-7]].forEach(([ox,oy])=>{
+    ctx.fillStyle='#000'; ctx.fillRect(ox*cell,oy*cell,7*cell,7*cell);
+    ctx.fillStyle='#fff'; ctx.fillRect((ox+1)*cell,(oy+1)*cell,5*cell,5*cell);
+    ctx.fillStyle='#000'; ctx.fillRect((ox+2)*cell,(oy+2)*cell,3*cell,3*cell);
+  });
+  ctx.fillStyle='#000';
+  for(let y=0;y<cols;y++) for(let x=0;x<cols;x++){
+    if((x<8&&y<8)||(x>cols-9&&y<8)||(x<8&&y>cols-9)) continue;
+    if(rand()>.55) ctx.fillRect(x*cell,y*cell,cell,cell);
+  }
+}
+
+drawLogo();
+
+// ── Toast ──
+function showToast(msg) {
+  let t = document.getElementById('global-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'global-toast';
+    t.className = 'toast';
+    document.querySelector('.phone-screen').appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('visible'), 2200);
+}
+
+// ── QR: copy link ──
+function copyQrLink() {
+  const link = 'myco://a3f9b2c1';
+  navigator.clipboard.writeText(link).catch(() => {});
+  const btn = event.currentTarget;
+  const original = btn.innerHTML;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copiado`;
+  btn.style.background = 'rgba(61,186,82,.25)';
+  setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; }, 2000);
+  showToast('Enlace copiado');
+}
+
+// ── QR: download ──
+function downloadQr() {
+  const c = document.getElementById('qr-canvas');
+  if (!c) return;
+  const a = document.createElement('a');
+  a.download = 'myco-qr-a3f9b2c1.png';
+  a.href = c.toDataURL('image/png');
+  a.click();
+  showToast('QR descargado');
+}
+
+// ── QR: share ──
+function shareQr() {
+  if (navigator.share) {
+    navigator.share({ title: 'Myco — Agrega mi contacto', text: 'Conéctate conmigo en Myco', url: 'myco://a3f9b2c1' }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText('myco://a3f9b2c1').catch(() => {});
+    showToast('Enlace copiado al portapapeles');
+  }
+}
+
+// ── Alias (custom name) ──
+function openAlias() {
+  const overlay = document.getElementById('alias-overlay');
+  if (!overlay) return;
+  overlay.classList.add('visible');
+  const input = document.getElementById('alias-input');
+  const currentName = document.getElementById('chat-topbar-name-text').textContent;
+  input.value = (currentName === 'f7a23d91') ? '' : currentName;
+  setTimeout(() => input.focus(), 120);
+}
+
+function closeAlias() {
+  document.getElementById('alias-overlay').classList.remove('visible');
+}
+
+function saveAlias() {
+  const val = document.getElementById('alias-input').value.trim();
+  const nameEl = document.getElementById('chat-topbar-name-text');
+  if (nameEl) nameEl.textContent = val || 'f7a23d91';
+  closeAlias();
+  showToast(val ? `Nombre guardado: "${val}"` : 'Nombre eliminado');
+}
+
+// ── Context menu ──
+function toggleCtx() {
+  const o = document.getElementById('ctx-overlay');
+  o.classList.toggle('visible');
+}
+
+// ── Voice recorder toggle ──
+function toggleVoiceRec() {
+  const ui = document.getElementById('voice-rec-ui');
+  const ia = document.getElementById('chat-input-area');
+  const visible = ui.classList.toggle('visible');
+  if (ia) ia.style.display = visible ? 'none' : 'flex';
+}
+
+// ── Permission onboarding ──
+const permData = [
+  {
+    icon: `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-3"/><path d="M8 2v4h8V2"/><path d="M16 2h3a2 2 0 012 2v2"/><circle cx="12" cy="14" r="2"/><line x1="12" y1="10" x2="12" y2="12"/></svg>`,
+    title: 'Bluetooth LE',
+    desc: 'Myco usa Bluetooth Low Energy para descubrir nodos y transmitir mensajes sin internet.',
+    why: 'Sin Bluetooth, Myco no puede comunicarse con ningún nodo. No enviamos datos a servidores.'
+  },
+  {
+    icon: `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
+    title: 'Notificaciones',
+    desc: 'Myco te notifica cuando recibes un mensaje, incluso cuando la app está en segundo plano.',
+    why: 'Las notificaciones son locales y no pasan por servidores externos. Puedes desactivarlas.'
+  },
+  {
+    icon: `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+    title: 'Ejecución en segundo plano',
+    desc: 'Para actuar como nodo relay, Myco necesita permanecer activo para retransmitir mensajes de la red.',
+    why: 'Solo lo usamos para la funcionalidad mesh. Puedes desactivar el relay en cualquier momento.'
+  }
+];
+
+function nextPerm() {
+  permStep = (permStep + 1) % permData.length;
+  const d = permData[permStep];
+  document.getElementById('perm-icon').innerHTML = d.icon;
+  document.getElementById('perm-title').textContent = d.title;
+  document.getElementById('perm-desc').textContent = d.desc;
+  document.getElementById('perm-why').textContent = d.why;
+  [0,1,2].forEach(i => document.getElementById('perm-dot-'+i).classList.toggle('active', i === permStep));
+  if (permStep === 0) show('identity');
+}
+
+// ── PIN lock ──
+function pinPress(n) {
+  if (pinDigits >= 4) return;
+  document.getElementById('pd'+pinDigits).classList.add('filled');
+  pinDigits++;
+  if (pinDigits === 4) {
+    setTimeout(() => {
+      for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('filled');
+      pinDigits = 0;
+      show('chats');
+    }, 400);
+  }
+}
+function pinDelete() {
+  if (pinDigits <= 0) return;
+  pinDigits--;
+  document.getElementById('pd'+pinDigits).classList.remove('filled');
+}
+
+// ── Heatmap ──
+function drawHeatmap() {
+  const c = document.getElementById('heatmap-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W=343, H=200, cols=24, rows=14;
+  const cw=W/cols, ch=H/rows;
+  ctx.clearRect(0,0,W,H);
+  const hotspots=[{x:6,y:4,r:4,v:.9},{x:16,y:9,r:3,v:.7},{x:3,y:10,r:2,v:.5},{x:20,y:3,r:2.5,v:.6},{x:11,y:7,r:2,v:.45}];
+  for(let y=0;y<rows;y++) for(let x=0;x<cols;x++){
+    let v=0;
+    hotspots.forEach(h=>{const d=Math.sqrt((x-h.x)**2+(y-h.y)**2);v+=Math.max(0,(1-d/h.r)*h.v);});
+    v=Math.min(1,v);
+    if(v>0.05){ctx.fillStyle=`rgba(61,186,82,${v*.75})`;ctx.fillRect(x*cw+.5,y*ch+.5,cw-1,ch-1);}
+  }
+}
+
+// ── About mini logo ──
+function drawAboutLogo() {
+  const c = document.getElementById('about-logo-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d'), W=88, H=88, cx=W/2, cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  const nodes=[[cx,cy],[cx-25,cy-22],[cx+25,cy-22],[cx-32,cy+5],[cx+32,cy+5],[cx-14,cy+30],[cx+14,cy+30]];
+  const conns=[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,3],[2,4]];
+  conns.forEach(([a,b])=>{
+    ctx.strokeStyle='rgba(26,77,36,.7)';ctx.lineWidth=1.8;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(nodes[a][0],nodes[a][1]);ctx.lineTo(nodes[b][0],nodes[b][1]);ctx.stroke();
+  });
+  nodes.forEach(([x,y],i)=>{
+    const r=i===0?6:4;
+    ctx.beginPath();ctx.arc(x,y,r*2,0,Math.PI*2);ctx.fillStyle='rgba(26,77,36,.2)';ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle='#3DBA52';ctx.fill();
+  });
+}
+
+// ── Ping animation ──
+function startPingAnim() {
+  if (pingRunning) return;
+  pingRunning = true;
+  document.getElementById('ping-val').textContent='…';
+  document.getElementById('ping-hops').textContent='…';
+  document.getElementById('ping-recv').textContent='0';
+  const hops = ['hop1','hop2','hop3','target'];
+  const delays = [400, 900, 1400, 1900];
+  hops.forEach((h, i) => {
+    setTimeout(() => {
+      const badge = document.getElementById(h === 'target' ? null : h+'-badge');
+      const node = document.getElementById(h === 'target' ? 'target-node' : h+'-node');
+      const lbl = document.getElementById(h === 'target' ? 'target-lbl' : null);
+      if (badge) badge.style.opacity = '1';
+      if (node) node.style.opacity = '1';
+      if (lbl) lbl.style.opacity = '1';
+      if (document.getElementById('target-lbl')) document.getElementById('target-lbl').style.opacity = h === 'target' ? '1' : document.getElementById('target-lbl').style.opacity;
+    }, delays[i]);
+  });
+  setTimeout(()=>{
+    document.getElementById('target-lbl').style.opacity='1';
+    document.getElementById('target-node').style.opacity='1';
+    document.getElementById('ping-val').textContent='340ms';
+    document.getElementById('ping-hops').textContent='3';
+    document.getElementById('ping-recv').textContent='1';
+    pingRunning=false;
+  }, 2200);
+}
+
+// ── Search filter toggle ──
+function setFilter(el) {
+  document.querySelectorAll('.search-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

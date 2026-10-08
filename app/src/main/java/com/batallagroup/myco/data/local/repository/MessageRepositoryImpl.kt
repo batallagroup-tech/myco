@@ -28,6 +28,24 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun deleteExpiredMessages() =
         dao.deleteExpiredMessages()
 
+    override suspend fun markMessagesAsRead(contactId: String) =
+        dao.markMessagesAsRead(contactId)
+
+    override fun getTotalUnreadCount(): Flow<Int> =
+        dao.getTotalUnreadCount()
+
+    override suspend fun getPendingOutgoingMessages(): List<Message> =
+        dao.getPendingOutgoingMessages().map { it.toDomain() }
+
     override suspend fun getMessageById(messageId: String): Message? =
         dao.getMessageById(messageId)?.toDomain()
+
+    override suspend fun deleteMessages(ids: List<String>) =
+        dao.deleteMessagesByIds(ids)
+
+    override suspend fun deleteChatHistory(contactId: String) =
+        dao.deleteMessagesForContact(contactId)
+
+    override suspend fun markTransitMessagesAsFailed() =
+        dao.markTransitMessagesAsFailed()
 }

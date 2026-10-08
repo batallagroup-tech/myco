@@ -36,15 +36,91 @@ fun ContactsScreen(
 ) {
     val contacts by viewModel.contacts.collectAsStateWithLifecycle()
     val addResult by viewModel.addResult.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showAddDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(addResult) {
-        if (addResult != null) {
-            // Mostrar Snackbar — en producción usar SnackbarHostState
+        addResult?.let {
+            snackbarHostState.showSnackbar(it)
         }
+    }
+
+    if (showAddDialog) {
+        var inputId by remember { mutableStateOf("") }
+        var inputAlias by remember { mutableStateOf("") }
+        var inputPhone by remember { mutableStateOf("") }
+
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            title = { Text("Agregar contacto", color = MycoGreen, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = inputId,
+                        onValueChange = { inputId = it.trim().lowercase() },
+                        label = { Text("ID del contacto (8 caracteres)", color = MycoSubtle) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MycoGreen,
+                            unfocusedBorderColor = MycoSurface3,
+                            focusedTextColor = MycoOnSurface,
+                            unfocusedTextColor = MycoOnSurface
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = inputAlias,
+                        onValueChange = { inputAlias = it },
+                        label = { Text("Alias / Nombre (opcional)", color = MycoSubtle) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MycoGreen,
+                            unfocusedBorderColor = MycoSurface3,
+                            focusedTextColor = MycoOnSurface,
+                            unfocusedTextColor = MycoOnSurface
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = inputPhone,
+                        onValueChange = { inputPhone = it.trim() },
+                        label = { Text("Teléfono celular (para SMS sin internet)", color = MycoSubtle) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MycoGreen,
+                            unfocusedBorderColor = MycoSurface3,
+                            focusedTextColor = MycoOnSurface,
+                            unfocusedTextColor = MycoOnSurface
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (inputId.isNotBlank()) {
+                            viewModel.addContactManual(inputId, inputAlias, inputPhone)
+                            showAddDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MycoGreen)
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text("Cancelar", color = MycoSubtle)
+                }
+            },
+            containerColor = MycoSurface
+        )
     }
 
     Scaffold(
         containerColor = MycoBg,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MycoSurface),
@@ -63,6 +139,16 @@ fun ContactsScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddDialog = true },
+                containerColor = MycoGreen,
+                contentColor = MycoBg,
+                shape = CircleShape
+            ) {
+                Icon(Icons.Default.Person, contentDescription = "Agregar contacto")
+            }
         }
     ) { padding ->
         Column(
@@ -86,18 +172,26 @@ fun ContactsScreen(
                         Text("Sin contactos", color = MycoSubtle, fontSize = 16.sp)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Escanea el QR de otro usuario para agregar un contacto",
+                            "Agrega un contacto con su ID o escaneando su código QR",
                             color = MycoSurface3,
                             fontSize = 13.sp
                         )
                         Spacer(Modifier.height(24.dp))
-                        Button(
-                            onClick = onScanQr,
-                            colors = ButtonDefaults.buttonColors(containerColor = MycoGreen)
-                        ) {
-                            Icon(Icons.Default.QrCodeScanner, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Escanear QR")
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Button(
+                                onClick = { showAddDialog = true },
+                                colors = ButtonDefaults.buttonColors(containerColor = MycoGreen)
+                            ) {
+                                Text("Ingresar ID")
+                            }
+                            OutlinedButton(
+                                onClick = onScanQr,
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MycoGreen)
+                            ) {
+                                Icon(Icons.Default.QrCodeScanner, null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Escanear QR")
+                            }
                         }
                     }
                 }
@@ -144,17 +238,26 @@ private fun ContactRow(contact: Contact, onClick: () -> Unit) {
 
         Column {
             Text(
-                contact.alias.ifEmpty { contact.userId },
+                contact.displayName,
                 color = MycoOnSurface,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp
             )
-            Text(
-                "ID: ${contact.userId}",
-                color = MycoSubtle,
-                fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    if (contact.customNickname.isNotBlank() && contact.alias.isNotBlank()) "Red: ${contact.alias} • ID: ${contact.userId}" else "ID: ${contact.userId}",
+                    color = MycoSubtle,
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+                if (contact.phoneNumber.isNotBlank()) {
+                    Text(
+                        "📱 ${contact.phoneNumber}",
+                        color = MycoGreen,
+                        fontSize = 11.sp
+                    )
+                }
+            }
         }
     }
     HorizontalDivider(

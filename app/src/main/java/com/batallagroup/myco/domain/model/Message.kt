@@ -9,5 +9,8 @@ data class Message(
     val expiresAt: Long,
     val status: MessageStatus,
     val hopCount: Int = 0,
-    val isOutgoing: Boolean = false
+    val isOutgoing: Boolean = false,
+    val transportType: String = "RELAY",
+    val isSos: Boolean = false,
+    val isRead: Boolean = true
 )

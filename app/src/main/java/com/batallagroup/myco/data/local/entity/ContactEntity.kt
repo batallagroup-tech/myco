@@ -11,7 +11,9 @@ data class ContactEntity(
     val signPublicKey: String,
     val alias: String,
     val addedAt: Long,
-    val lastSeenAt: Long
+    val lastSeenAt: Long,
+    val phoneNumber: String = "",
+    val customNickname: String = ""
 ) {
     fun toDomain() = Contact(
         userId = userId,
@@ -19,7 +21,9 @@ data class ContactEntity(
         signPublicKey = signPublicKey,
         alias = alias,
         addedAt = addedAt,
-        lastSeenAt = lastSeenAt
+        lastSeenAt = lastSeenAt,
+        phoneNumber = phoneNumber,
+        customNickname = customNickname
     )
 
     companion object {
@@ -29,7 +33,9 @@ data class ContactEntity(
             signPublicKey = c.signPublicKey,
             alias = c.alias,
             addedAt = c.addedAt,
-            lastSeenAt = c.lastSeenAt
+            lastSeenAt = c.lastSeenAt,
+            phoneNumber = c.phoneNumber,
+            customNickname = c.customNickname
         )
     }
 }

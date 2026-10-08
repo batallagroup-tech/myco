@@ -22,7 +22,7 @@ class GattServer @Inject constructor(
 ) {
     private val tag = "MycoGattServer"
     private var gattServer: BluetoothGattServer? = null
-    private val receiveBuffer = StringBuilder()
+    private val deviceBuffers = java.util.concurrent.ConcurrentHashMap<String, StringBuilder>()
 
     private val serverCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
@@ -30,6 +30,7 @@ class GattServer @Inject constructor(
                 Log.d(tag, "Nodo conectado: ${device.address}")
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(tag, "Nodo desconectado: ${device.address}")
+                deviceBuffers.remove(device.address)
             }
         }
 
@@ -43,14 +44,32 @@ class GattServer @Inject constructor(
             value: ByteArray
         ) {
             if (characteristic.uuid == Constants.MYCO_CHARACTERISTIC_UUID) {
+                val buffer = deviceBuffers.getOrPut(device.address) { StringBuilder() }
                 val chunk = String(value, Charsets.UTF_8)
-                receiveBuffer.append(chunk)
+                buffer.append(chunk)
 
-                // Detección de fin de paquete (JSON completo)
-                val buffered = receiveBuffer.toString()
-                if (buffered.trimEnd().endsWith("}")) {
-                    packetProcessor.processIncoming(buffered.trim())
-                    receiveBuffer.clear()
+                val buffered = buffer.toString()
+
+                // 1. Detección por delimitador de marco robusto <MYCO_MSG> ... </MYCO_MSG>
+                if (buffered.contains("<MYCO_MSG>") && buffered.contains("</MYCO_MSG>")) {
+                    val startIdx = buffered.indexOf("<MYCO_MSG>") + "<MYCO_MSG>".length
+                    val endIdx = buffered.indexOf("</MYCO_MSG>")
+                    if (endIdx > startIdx) {
+                        val payload = buffered.substring(startIdx, endIdx).trim()
+                        packetProcessor.processIncoming(payload, transportType = Constants.TRANSPORT_BLE)
+                        buffer.delete(0, endIdx + "</MYCO_MSG>".length)
+                    }
+                } else if (buffered.startsWith("{") && buffered.trimEnd().endsWith("}")) {
+                    // 2. Soporte para JSON directo
+                    try {
+                        packetProcessor.processIncoming(buffered.trim(), transportType = Constants.TRANSPORT_BLE)
+                        deviceBuffers.remove(device.address)
+                    } catch (e: Exception) {
+                        // Esperar más fragmentos si aún no está completo
+                    }
+                } else if (buffered.length > 8192) {
+                    // Prevenir desbordamiento de memoria por datos corruptos
+                    deviceBuffers.remove(device.address)
                 }
             }
 

@@ -11,8 +11,8 @@ import com.batallagroup.myco.data.local.entity.TransitMessageEntity
 
 @Database(
     entities = [MessageEntity::class, ContactEntity::class, TransitMessageEntity::class],
-    version = 1,
-    exportSchema = true
+    version = 4,
+    exportSchema = false
 )
 abstract class MycoDatabase : RoomDatabase() {
     abstract fun messageDao(): MessageDao

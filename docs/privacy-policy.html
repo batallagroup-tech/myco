@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad — Myco</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0B0E14; color: #E0E6ED; line-height: 1.8; padding: 2.5rem 1.2rem; }
+    .container { max-width: 780px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid #1F2937; }
+    .logo-badge { display: inline-block; background: rgba(0, 230, 153, 0.1); border: 1px solid rgba(0, 230, 153, 0.3); color: #00E699; padding: 0.3rem 0.9rem; border-radius: 99px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+    header h1 { font-size: 2.2rem; color: #FFFFFF; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+    header p { color: #8892B0; font-size: 0.95rem; }
+    h2 { font-size: 1.3rem; color: #00E699; margin: 2.2rem 0 0.8rem; border-left: 3px solid #00E699; padding-left: 10px; }
+    p, li { color: #C5D1DE; margin-bottom: 1rem; font-size: 1rem; }
+    ul { padding-left: 1.5rem; margin-bottom: 1.2rem; }
+    li { margin-bottom: 0.5rem; }
+    strong { color: #FFFFFF; }
+    a { color: #00E699; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card { background: #131A26; border: 1px solid #1F2937; border-radius: 12px; padding: 1.2rem; margin: 1.5rem 0; }
+    footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #1F2937; text-align: center; color: #64748B; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-badge">🍄 Myco &bull; Batalla Group</div>
+      <h1>Política de Privacidad</h1>
+      <p>Última actualización: 3 de octubre de 2026</p>
+    </header>
+
+    <div class="card">
+      <p style="margin: 0; color: #00E699; font-weight: 600;">
+        Resumen de Privacidad: Myco es una aplicación de mensajería privada y descentralizada. NO recopilamos, NO almacenamos ni vendemos ningún tipo de dato personal, número de teléfono o registro de actividad.
+      </p>
+    </div>
+
+    <h2>1. Responsable del Tratamiento de Datos</h2>
+    <p>La aplicación <strong>Myco</strong> es desarrollada y operada por <strong>Batalla Group</strong>. Si tienes dudas sobre esta política o la aplicación, puedes contactarnos directamente al correo electrónico: <a href="mailto:batallagroup@gmail.com">batallagroup@gmail.com</a>.</p>
+
+    <h2>2. Datos Personales y Cero Recopilación</h2>
+    <p>Myco está fundamentada en el principio de <strong>Privacidad por Diseño (Privacy by Design)</strong>:</p>
+    <ul>
+      <li><strong>Sin registro ni credenciales:</strong> No solicitamos tu nombre real, número de teléfono, correo electrónico ni contactos de tu agenda.</li>
+      <li><strong>Identidad Criptográfica:</strong> Tu identidad se genera de forma matemática y local en tu dispositivo mediante pares de claves criptográficas asimétricas.</li>
+      <li><strong>Sin bases de datos centrales:</strong> Batalla Group no posee servidores de base de datos donde se registren tus mensajes o información personal.</li>
+    </ul>
+
+    <h2>3. Cifrado de Extremo a Extremo (E2EE)</h2>
+    <p>Todos los mensajes enviados a través de Myco se cifran y descifran exclusivamente en los dispositivos finales utilizando algoritmos criptográficos robustos de grado militar (<strong>ECDH P-256 + AES-256-GCM + ECDSA SHA-256</strong>). Ni intermediarios, ni relays, ni Batalla Group pueden descifrar o leer el contenido de tus comunicaciones.</p>
+
+    <h2>4. Arquitectura de Transmisión (Mesh BLE y Relays Descentralizados)</h2>
+    <ul>
+      <li><strong>Red Mesh Local (Bluetooth Low Energy):</strong> Permite la comunicación directa dispositivo a dispositivo sin conexión a internet. Los paquetes en tránsito se almacenan temporalmente y cifrados en memoria local para saltos de red y son eliminados automáticamente al expirar su tiempo de vida (TTL).</li>
+      <li><strong>Relays Descentralizados (Larga Distancia):</strong> Para mensajería por internet, Myco utiliza nodos descentralizados públicos (protocolo Nostr). Los eventos transmitidos contienen únicamente el paquete cifrado ininteligible para terceros.</li>
+    </ul>
+
+    <h2>5. Permisos del Dispositivo</h2>
+    <p>La aplicación solicita únicamente los permisos indispensables para su operación local:</p>
+    <ul>
+      <li><strong>Bluetooth (Escanear, Conectar, Anunciar):</strong> Requerido para establecer la red de malla local sin conexión a internet.</li>
+      <li><strong>Cámara:</strong> Requerido únicamente para escanear códigos QR de contactos de forma local en tiempo real. No se toman fotos ni se envían imágenes a servidores.</li>
+      <li><strong>Notificaciones:</strong> Para avisarte en la barra de estado cuando recibas un nuevo mensaje cifrado.</li>
+    </ul>
+
+    <h2>6. Publicidad y Rastreadores</h2>
+    <p>Myco <strong>NO contiene anuncios publicitarios</strong>, NO integra SDKs de rastreo (trackers) de terceros y NO utiliza el identificador de publicidad de Google (AD_ID).</p>
+
+    <h2>7. Eliminación y Control de tus Datos</h2>
+    <p>El usuario tiene control absoluto sobre su información. Puedes borrar mensajes individuales, vaciar conversaciones completas o eliminar todas las claves criptográficas desinstalando la app o restableciendo la identidad desde los Ajustes.</p>
+
+    <h2>8. Contacto</h2>
+    <p>Para cualquier aclaración sobre esta política de privacidad, escribe a: <a href="mailto:batallagroup@gmail.com">batallagroup@gmail.com</a>.</p>
+
+    <footer>
+      &copy; 2026 Batalla Group. Todos los derechos reservados.
+    </footer>
+  </div>
+</body>
+</html>

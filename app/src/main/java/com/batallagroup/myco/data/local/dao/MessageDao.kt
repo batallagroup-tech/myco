@@ -28,4 +28,31 @@ interface MessageDao {
 
     @Query("SELECT * FROM messages WHERE id = :messageId LIMIT 1")
     suspend fun getMessageById(messageId: String): MessageEntity?
+
+    @Query("DELETE FROM messages WHERE id = :messageId")
+    suspend fun deleteMessageById(messageId: String)
+
+    @Query("DELETE FROM messages WHERE id IN (:messageIds)")
+    suspend fun deleteMessagesByIds(messageIds: List<String>)
+
+    @Query("UPDATE messages SET isRead = 1 WHERE (senderId = :contactId OR recipientId = :contactId) AND isRead = 0")
+    suspend fun markMessagesAsRead(contactId: String)
+
+    @Query("SELECT COUNT(*) FROM messages WHERE (senderId = :contactId OR recipientId = :contactId) AND isRead = 0 AND isOutgoing = 0")
+    fun getUnreadCountForContact(contactId: String): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM messages WHERE isRead = 0 AND isOutgoing = 0")
+    fun getTotalUnreadCount(): Flow<Int>
+
+    @Query("SELECT * FROM messages WHERE isOutgoing = 1 AND (status = 'PENDING' OR status = 'FAILED') ORDER BY timestamp ASC")
+    suspend fun getPendingOutgoingMessages(): List<MessageEntity>
+
+    @Query("UPDATE messages SET status = 'FAILED' WHERE isOutgoing = 1 AND status IN ('SENDING', 'IN_TRANSIT', 'PENDING')")
+    suspend fun markTransitMessagesAsFailed()
+
+    @Query("DELETE FROM messages WHERE isOutgoing = 1 AND status IN ('SENDING', 'IN_TRANSIT', 'PENDING') AND timestamp < :olderThan")
+    suspend fun deleteStaleOutgoingTransitMessages(olderThan: Long)
+
+    @Query("DELETE FROM messages WHERE senderId = :contactId OR recipientId = :contactId")
+    suspend fun deleteMessagesForContact(contactId: String)
 }

@@ -5,6 +5,15 @@ data class Contact(
     val encPublicKey: String,    // Clave pública de cifrado (base64)
     val signPublicKey: String,   // Clave pública de firma (base64)
     val alias: String = "",
+    val phoneNumber: String = "",
     val addedAt: Long = System.currentTimeMillis(),
-    val lastSeenAt: Long = 0L
-)
+    val lastSeenAt: Long = 0L,
+    val customNickname: String = ""
+) {
+    val displayName: String
+        get() = when {
+            customNickname.isNotBlank() -> customNickname
+            alias.isNotBlank() -> alias
+            else -> "Nodo ${userId.take(4).uppercase()}"
+        }
+}

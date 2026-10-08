@@ -30,6 +30,8 @@ class PreferenceManager @Inject constructor(
     fun putString(key: String, value: String) = prefs.edit().putString(key, value).apply()
     fun getBoolean(key: String, default: Boolean = false): Boolean = prefs.getBoolean(key, default)
     fun putBoolean(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
+    fun getStringSet(key: String): Set<String> = prefs.getStringSet(key, emptySet()) ?: emptySet()
+    fun putStringSet(key: String, values: Set<String>) = prefs.edit().putStringSet(key, values).apply()
     fun contains(key: String): Boolean = prefs.contains(key)
     fun clear() = prefs.edit().clear().apply()
 }

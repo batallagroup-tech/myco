@@ -7,22 +7,32 @@ plugins {
 
 android {
     namespace = "com.batallagroup.myco"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.batallagroup.myco"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 36
+        versionCode = 15
+        versionName = "1.1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:/Keys/myco/myco-release.jks")
+            storePassword = "batallagroup123"
+            keyAlias = "myco"
+            keyPassword = "batallagroup123"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -96,18 +106,15 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    // Crypto — Libsodium vía Lazysodium
-    implementation("com.goterl:lazysodium-android:5.1.0@aar")
-    implementation("net.java.dev.jna:jna:5.14.0@aar")
-
     // Almacenamiento seguro
-    implementation("androidx.security:security-crypto:1.0.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    // JSON
+    // JSON y Networking Descentralizado (Nostr Relays / WebSockets)
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // QR codes
     implementation("com.google.zxing:core:3.5.2")
